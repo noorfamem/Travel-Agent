@@ -1,0 +1,1648 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TravelAI Pro — Flights, Hotels &amp; 12-hour Day Plan for India</title>
+<meta name="description" content="Search real-time Indian domestic flights and hotels with AI-powered day planning. Live prices from Google Flights and Google Hotels via SerpAPI.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════ DESIGN TOKENS */
+:root {
+  --bg: #030712;
+  --bg2: #060e1f;
+  --surface: #0a1628;
+  --card: rgba(13, 22, 45, 0.85);
+  --card-solid: #0d162d;
+  --card2: rgba(18, 30, 58, 0.7);
+  --border: rgba(255,255,255,0.07);
+  --border-hi: rgba(99,179,237,0.3);
+  --border-glow: rgba(59,130,246,0.5);
+  --ink: #e8edf7;
+  --ink2: #94a3b8;
+  --ink3: #475569;
+  --pri: #3b82f6;
+  --pri-hi: #60a5fa;
+  --pri-glow: rgba(59,130,246,0.2);
+  --pri-deep: #1d4ed8;
+  --cyan: #06b6d4;
+  --cyan-glow: rgba(6,182,212,0.2);
+  --purple: #8b5cf6;
+  --purple-glow: rgba(139,92,246,0.2);
+  --green: #10b981;
+  --green-glow: rgba(16,185,129,0.2);
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --gold: #fbbf24;
+  --r: 18px;
+  --r-sm: 10px;
+  --r-xs: 6px;
+  --shadow: 0 4px 40px rgba(0,0,0,0.6);
+  --shadow-card: 0 8px 32px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.04) inset;
+  --shadow-glow: 0 0 60px rgba(59,130,246,0.1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════════════ ANIMATED BG */
+.bg-canvas {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 10%, rgba(59,130,246,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(139,92,246,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 60% at 50% 50%, rgba(6,182,212,0.04) 0%, transparent 70%),
+    linear-gradient(180deg, #030712 0%, #060e1f 100%);
+}
+.grid-lines {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.3;
+  background-image:
+    linear-gradient(rgba(59,130,246,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,130,246,0.06) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+}
+
+/* ═══════════════════════════════════════════════════ SCROLLBAR */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(99,179,237,0.25); border-radius: 3px; }
+
+/* ═══════════════════════════════════════════════════ HEADER */
+header {
+  position: sticky; top: 0; z-index: 200;
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  background: rgba(3,7,18,0.75);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  padding: 0 24px;
+}
+.header-inner {
+  max-width: 1300px; margin: 0 auto; height: 64px;
+  display: flex; align-items: center; gap: 16px;
+}
+.logo { display: flex; align-items: center; gap: 12px; }
+.logo-icon {
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, var(--pri), var(--cyan));
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 0 20px rgba(59,130,246,0.35), 0 4px 12px rgba(0,0,0,0.4);
+  animation: logo-pulse 3s ease-in-out infinite;
+}
+@keyframes logo-pulse {
+  0%,100% { box-shadow: 0 0 20px rgba(59,130,246,0.35), 0 4px 12px rgba(0,0,0,0.4); }
+  50% { box-shadow: 0 0 32px rgba(59,130,246,0.55), 0 4px 16px rgba(0,0,0,0.4); }
+}
+.logo-text h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 20px; font-weight: 800; letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #fff 30%, var(--pri-hi));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.logo-text h1 span { color: var(--pri-hi); -webkit-text-fill-color: var(--pri-hi); }
+.header-sub { color: var(--ink3); font-size: 11px; margin-top: 1px; }
+.ver-badge {
+  margin-left: auto;
+  background: rgba(59,130,246,0.12);
+  border: 1px solid rgba(59,130,246,0.25);
+  color: var(--pri-hi);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+  transition: all 0.3s;
+}
+.ver-badge.connected {
+  background: rgba(16,185,129,0.12);
+  border-color: rgba(16,185,129,0.3);
+  color: #34d399;
+}
+
+/* ═══════════════════════════════════════════════════ STEP NAV */
+.step-nav {
+  background: rgba(3,7,18,0.6);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  position: sticky; top: 64px; z-index: 190;
+  overflow-x: auto;
+}
+.step-nav::-webkit-scrollbar { height: 0; }
+.step-nav-inner {
+  max-width: 1300px; margin: 0 auto;
+  display: flex; gap: 0;
+}
+.step-tab {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 20px;
+  color: var(--ink3); font-size: 12px; font-weight: 600;
+  border-bottom: 2px solid transparent;
+  cursor: pointer; white-space: nowrap;
+  transition: all 0.2s; user-select: none;
+  text-decoration: none;
+}
+.step-tab:hover { color: var(--ink2); border-bottom-color: var(--border-hi); }
+.step-tab.active { color: var(--pri-hi); border-bottom-color: var(--pri); }
+.step-num {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; flex-shrink: 0;
+  transition: all 0.2s;
+}
+.step-tab.active .step-num {
+  background: var(--pri); color: #fff;
+}
+.step-tab.done .step-num {
+  background: var(--green); color: #fff;
+}
+.step-tab.done { color: var(--ink2); }
+
+/* ═══════════════════════════════════════════════════ LAYOUT */
+main {
+  position: relative; z-index: 1;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 28px 20px 80px;
+  display: flex; flex-direction: column; gap: 24px;
+}
+
+/* ═══════════════════════════════════════════════════ CARDS */
+.card {
+  background: var(--card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 26px;
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.3s, box-shadow 0.3s;
+  position: relative; overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute; inset: 0; border-radius: var(--r);
+  background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%);
+  pointer-events: none;
+}
+.card:hover { border-color: rgba(255,255,255,0.1); box-shadow: var(--shadow-card), var(--shadow-glow); }
+.card-header {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 20px; padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.card-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+.card-icon.blue { background: rgba(59,130,246,0.15); box-shadow: 0 0 20px rgba(59,130,246,0.15); }
+.card-icon.purple { background: rgba(139,92,246,0.15); box-shadow: 0 0 20px rgba(139,92,246,0.15); }
+.card-icon.cyan { background: rgba(6,182,212,0.15); box-shadow: 0 0 20px rgba(6,182,212,0.15); }
+.card-icon.green { background: rgba(16,185,129,0.15); box-shadow: 0 0 20px rgba(16,185,129,0.15); }
+.card-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 17px; font-weight: 700; letter-spacing: -0.3px;
+}
+.card-sub { color: var(--ink3); font-size: 12px; margin-top: 2px; }
+
+/* ═══════════════════════════════════════════════════ FORM CONTROLS */
+.grid-3 { display: grid; gap: 14px; grid-template-columns: repeat(3, 1fr); }
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+.grid-2 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+@media (max-width: 860px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px) { .grid-3 { grid-template-columns: 1fr; } }
+
+label.field { display: flex; flex-direction: column; gap: 6px; }
+.field-label {
+  font-size: 10px; font-weight: 700; color: var(--ink3);
+  text-transform: uppercase; letter-spacing: 0.8px;
+}
+input, select, textarea {
+  font-family: inherit; font-size: 13px;
+  padding: 10px 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: rgba(255,255,255,0.04);
+  color: var(--ink);
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  width: 100%;
+}
+input:hover, select:hover { background: rgba(255,255,255,0.06); }
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--pri);
+  box-shadow: 0 0 0 3px var(--pri-glow);
+  background: rgba(59,130,246,0.05);
+}
+select option { background: #0d162d; color: var(--ink); }
+input[type=date]::-webkit-calendar-picker-indicator { filter: invert(0.5); cursor: pointer; }
+
+/* ═══════════════════════════════════════════════════ BUTTONS */
+.btn {
+  font-family: inherit; font-size: 13px; font-weight: 600;
+  cursor: pointer; border: 0;
+  border-radius: var(--r-sm);
+  padding: 11px 22px;
+  transition: all 0.2s;
+  display: inline-flex; align-items: center; gap: 7px;
+  letter-spacing: 0.1px; white-space: nowrap;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--pri), var(--pri-deep));
+  color: #fff;
+  box-shadow: 0 4px 18px rgba(59,130,246,0.35);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(59,130,246,0.5);
+  background: linear-gradient(135deg, #4f94ff, var(--pri));
+}
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled { opacity: 0.5; cursor: wait; transform: none !important; box-shadow: none !important; }
+.btn-outline {
+  background: transparent; color: var(--pri-hi);
+  border: 1px solid rgba(59,130,246,0.35);
+}
+.btn-outline:hover { background: var(--pri-glow); border-color: var(--pri); }
+.btn-sm { padding: 7px 14px; font-size: 12px; border-radius: var(--r-xs); }
+.btn-xs { padding: 5px 11px; font-size: 11px; border-radius: var(--r-xs); }
+
+/* Booking link button — prominent CTA */
+.btn-book {
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+  color: #fff; font-size: 12px; font-weight: 700;
+  padding: 9px 18px; border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(14,165,233,0.4);
+  border: none; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: all 0.2s; text-decoration: none;
+  letter-spacing: 0.1px;
+}
+.btn-book:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(14,165,233,0.55);
+  filter: brightness(1.1);
+}
+.btn-book.purple-cta {
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
+  box-shadow: 0 4px 14px rgba(139,92,246,0.4);
+}
+.btn-book.purple-cta:hover { box-shadow: 0 8px 22px rgba(139,92,246,0.55); }
+.btn-book.search-cta {
+  background: linear-gradient(135deg, #0f766e, #0891b2);
+  box-shadow: 0 4px 14px rgba(8,145,178,0.35);
+}
+.btn-book.search-cta:hover { box-shadow: 0 8px 22px rgba(8,145,178,0.5); }
+
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 16px; }
+.checkbox-row {
+  display: flex; align-items: center; gap: 8px;
+  color: var(--ink2); font-size: 13px; cursor: pointer;
+}
+.checkbox-row input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--pri); }
+
+/* ═══════════════════════════════════════════════════ BADGES */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 700;
+  padding: 3px 9px; border-radius: 999px;
+  letter-spacing: 0.5px; text-transform: uppercase;
+}
+.b-LIVE_API, .b-LIVE { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.25); }
+.b-SANDBOX { background: rgba(139,92,246,0.12); color: #a78bfa; border: 1px solid rgba(139,92,246,0.25); }
+.b-CACHED { background: rgba(6,182,212,0.12); color: #22d3ee; border: 1px solid rgba(6,182,212,0.25); }
+.b-ESTIMATE, .b-ESTIMATED { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
+.b-AI_GENERATED { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
+.b-UNAVAILABLE { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+.b-WEB_RESEARCH, .b-WEB { background: rgba(6,182,212,0.12); color: #22d3ee; border: 1px solid rgba(6,182,212,0.25); }
+.b-OVER { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+.b-KEY { background: rgba(16,185,129,0.08); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
+.b-NOKEY { background: rgba(239,68,68,0.08); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+.b-direct { background: rgba(14,165,233,0.12); color: #38bdf8; border: 1px solid rgba(14,165,233,0.3); }
+
+/* ═══════════════════════════════════════════════════ BANNERS */
+.banner {
+  padding: 13px 16px; border-radius: var(--r-sm); font-size: 13px;
+  display: flex; align-items: flex-start; gap: 10px; margin: 10px 0;
+}
+.banner-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.banner.ok { background: rgba(16,185,129,0.07); border: 1px solid rgba(16,185,129,0.18); color: #6ee7b7; }
+.banner.warn { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.18); color: #fde68a; }
+.banner.err { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.18); color: #fca5a5; }
+.banner.info { background: rgba(59,130,246,0.07); border: 1px solid rgba(59,130,246,0.18); color: #93c5fd; }
+
+/* ═══════════════════════════════════════════════════ FLIGHT CARDS */
+.offer {
+  background: rgba(13,22,45,0.9);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 0;
+  margin-top: 14px;
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
+  overflow: hidden;
+  cursor: default;
+}
+.offer:hover {
+  border-color: rgba(59,130,246,0.35);
+  box-shadow: 0 8px 32px rgba(59,130,246,0.12);
+  transform: translateY(-2px);
+}
+.offer.sel {
+  border-color: var(--pri);
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.3), 0 8px 32px rgba(59,130,246,0.2);
+}
+.offer.over-budget { border-color: rgba(239,68,68,0.25); }
+.offer.over-budget:hover { border-color: rgba(239,68,68,0.45); }
+
+/* Flight card top accent bar */
+.offer-accent {
+  height: 3px;
+  background: linear-gradient(90deg, var(--pri), var(--cyan));
+}
+.offer.over-budget .offer-accent {
+  background: linear-gradient(90deg, #ef4444, #f97316);
+}
+.offer-inner { padding: 18px 20px; }
+
+/* Flight card layout */
+.flight-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.flight-route { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+.flight-iata { font-size: 28px; font-weight: 900; letter-spacing: -1.5px; line-height: 1; font-family: 'Outfit', sans-serif; }
+.flight-city { font-size: 11px; color: var(--ink3); margin-top: 2px; }
+.flight-arrow {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  flex: 1; min-width: 80px;
+}
+.flight-line {
+  height: 2px;
+  background: linear-gradient(90deg, rgba(59,130,246,0.4), rgba(6,182,212,0.8), rgba(59,130,246,0.4));
+  width: 100%; border-radius: 1px; position: relative;
+}
+.flight-line::after {
+  content: '✈'; position: absolute; right: -3px; top: -10px;
+  font-size: 14px; color: var(--cyan);
+  filter: drop-shadow(0 0 6px rgba(6,182,212,0.6));
+}
+.flight-stops { font-size: 10px; color: var(--ink3); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.flight-time { font-size: 12px; color: var(--ink2); margin-top: 2px; }
+.flight-details { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.chip {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 999px; padding: 4px 11px;
+  font-size: 11px; color: var(--ink2);
+  display: inline-flex; align-items: center; gap: 4px;
+  transition: all 0.15s;
+}
+.chip:hover { background: rgba(255,255,255,0.07); }
+.chip.green { border-color: rgba(16,185,129,0.3); color: #6ee7b7; background: rgba(16,185,129,0.06); }
+.chip.blue { border-color: rgba(59,130,246,0.3); color: var(--pri-hi); background: var(--pri-glow); }
+.chip.amber { border-color: rgba(245,158,11,0.3); color: #fbbf24; background: rgba(245,158,11,0.06); }
+
+/* Price block */
+.price-block { text-align: right; flex-shrink: 0; }
+.price {
+  font-size: 30px; font-weight: 900; font-family: 'Outfit', sans-serif;
+  background: linear-gradient(135deg, #fff 20%, var(--pri-hi));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; line-height: 1;
+}
+.price-label { font-size: 11px; color: var(--ink3); margin-top: 3px; }
+.price-dash { font-size: 28px; font-weight: 800; color: var(--ink3); }
+
+/* Airline */
+.airline-logo { height: 22px; max-width: 72px; object-fit: contain; filter: brightness(1.2) saturate(0.7); }
+.airline-name { font-size: 13px; font-weight: 700; }
+.flight-num { font-size: 11px; color: var(--ink3); margin-top: 1px; }
+
+/* Card footer */
+.offer-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 20px 16px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  flex-wrap: wrap; gap: 10px;
+  background: rgba(0,0,0,0.2);
+}
+.offer-footer-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.offer-footer-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.source-note { font-size: 11px; color: var(--ink3); }
+
+/* ═══════════════════════════════════════════════════ HOTEL CARDS */
+.hotel-card {
+  background: rgba(13,22,45,0.9);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-top: 14px;
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
+}
+.hotel-card:hover {
+  border-color: rgba(139,92,246,0.35);
+  box-shadow: 0 8px 32px rgba(139,92,246,0.12);
+  transform: translateY(-2px);
+}
+.hotel-card.sel {
+  border-color: var(--purple);
+  box-shadow: 0 0 0 2px rgba(139,92,246,0.3);
+}
+.hotel-card.over-budget { border-color: rgba(239,68,68,0.25); }
+.hotel-thumb {
+  width: 100%; height: 160px;
+  object-fit: cover; display: block;
+  transition: transform 0.4s ease;
+}
+.hotel-card:hover .hotel-thumb { transform: scale(1.03); }
+.hotel-thumb-wrap { overflow: hidden; height: 160px; position: relative; }
+.hotel-thumb-placeholder {
+  height: 100px;
+  background: linear-gradient(135deg, rgba(139,92,246,0.08), rgba(59,130,246,0.08));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px;
+}
+.hotel-body { padding: 18px 20px; }
+.hotel-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.hotel-name { font-size: 16px; font-weight: 800; font-family: 'Outfit', sans-serif; line-height: 1.3; }
+.hotel-stars { color: var(--gold); font-size: 13px; letter-spacing: 1px; margin-top: 3px; }
+.hotel-location { font-size: 12px; color: var(--ink2); margin-top: 4px; }
+.hotel-rating { display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; }
+.rating-num {
+  font-size: 24px; font-weight: 900; font-family: 'Outfit', sans-serif;
+  background: linear-gradient(135deg, var(--purple), var(--cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; line-height: 1;
+}
+.rating-label { font-size: 10px; color: var(--ink3); text-align: right; }
+.hotel-amenities { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; }
+.hotel-footer {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-top: 14px; padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  flex-wrap: wrap; gap: 10px;
+}
+.hotel-price-block { text-align: right; }
+.hotel-price {
+  font-size: 24px; font-weight: 900; font-family: 'Outfit', sans-serif;
+  background: linear-gradient(135deg, #fff 20%, var(--purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; line-height: 1;
+}
+.hotel-price-night { font-size: 11px; color: var(--ink3); margin-top: 2px; }
+.hotel-total { font-size: 12px; color: var(--ink2); margin-top: 3px; }
+
+/* Hotel actions row */
+.hotel-actions {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 20px 14px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  flex-wrap: wrap; gap: 10px;
+  background: rgba(0,0,0,0.2);
+}
+.hotel-actions-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.hotel-actions-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* ═══════════════════════════════════════════════════ BOOKING LINK BLOCK */
+.booking-strip {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.booking-divider {
+  font-size: 11px; color: var(--ink3);
+}
+
+/* ═══════════════════════════════════════════════════ PROVIDER GRID */
+.prov-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+.prov-item {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 13px 16px;
+  display: flex; gap: 10px; align-items: flex-start;
+  transition: border-color 0.2s;
+}
+.prov-item:hover { border-color: rgba(255,255,255,0.1); }
+.prov-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+.prov-dot.ok { background: var(--green); box-shadow: 0 0 10px rgba(16,185,129,0.6); }
+.prov-dot.off { background: var(--ink3); }
+.prov-name { font-size: 13px; font-weight: 600; }
+.prov-role { font-size: 11px; color: var(--ink3); margin-top: 2px; }
+
+/* ═══════════════════════════════════════════════════ LINK CARDS (fallback) */
+.link-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 14px 16px; margin-top: 10px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.link-card:hover { border-color: rgba(59,130,246,0.3); background: rgba(59,130,246,0.04); }
+.link-card a { color: var(--pri-hi); text-decoration: none; font-weight: 600; font-size: 13px; }
+.link-card a:hover { text-decoration: underline; }
+.link-snippet { font-size: 12px; color: var(--ink2); margin-top: 6px; line-height: 1.5; }
+
+/* ═══════════════════════════════════════════════════ ITINERARY */
+.tl { list-style: none; padding-left: 24px; border-left: 2px solid rgba(59,130,246,0.4); margin-top: 20px; }
+.tl li {
+  padding: 0 0 22px 20px; position: relative;
+  transition: all 0.2s;
+}
+.tl li::before {
+  content: '';
+  position: absolute; left: -9px; top: 6px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--pri), var(--cyan));
+  border: 2px solid var(--bg);
+  box-shadow: 0 0 12px rgba(59,130,246,0.5);
+}
+.tl-time { font-size: 11px; font-weight: 800; color: var(--cyan); text-transform: uppercase; letter-spacing: 0.8px; }
+.tl-act { font-size: 15px; font-weight: 700; margin-top: 3px; font-family: 'Outfit', sans-serif; }
+.tl-det { font-size: 12px; color: var(--ink2); margin-top: 5px; line-height: 1.5; }
+.tl-cost { font-size: 12px; color: var(--ink3); margin-top: 5px; }
+.tl-transport { font-size: 12px; color: var(--amber); margin-top: 5px; }
+
+/* ═══════════════════════════════════════════════════ INTERESTS */
+.interest-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.interest-chips label {
+  display: flex; align-items: center; gap: 7px;
+  border: 1px solid var(--border);
+  border-radius: 999px; padding: 7px 14px;
+  cursor: pointer; font-size: 12px; font-weight: 500;
+  transition: all 0.2s; color: var(--ink2);
+  background: rgba(255,255,255,0.03);
+}
+.interest-chips label:hover { border-color: var(--pri); color: var(--pri-hi); background: var(--pri-glow); }
+.interest-chips label:has(input:checked) {
+  border-color: var(--pri); color: var(--pri-hi); background: var(--pri-glow);
+  box-shadow: 0 0 12px rgba(59,130,246,0.2);
+}
+.interest-chips input { display: none; }
+
+/* ═══════════════════════════════════════════════════ SUMMARY TABLE */
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 11px 14px; border-bottom: 1px solid var(--border); text-align: left; font-size: 13px; }
+th { color: var(--ink3); font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 0.7px; }
+td.n, th.n { text-align: right; }
+tr:last-child td { border-bottom: none; font-weight: 700; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* ═══════════════════════════════════════════════════ SPINNER */
+.spin {
+  display: inline-block; width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-top-color: var(--pri);
+  border-radius: 50%;
+  animation: spin .65s linear infinite; vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-state {
+  display: flex; align-items: center; gap: 14px;
+  padding: 28px; color: var(--ink2); font-size: 13px;
+}
+.loading-dots::after {
+  content: ''; animation: dots 1.5s infinite;
+}
+@keyframes dots {
+  0%,20% { content: '.'; }
+  40%,60% { content: '..'; }
+  80%,100% { content: '...'; }
+}
+
+/* ═══════════════════════════════════════════════════ SELECTED BAR */
+.sel-bar {
+  background: rgba(59,130,246,0.06);
+  border: 1px solid rgba(59,130,246,0.18);
+  border-radius: var(--r-sm);
+  padding: 12px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; flex-wrap: wrap; font-size: 13px;
+}
+.sel-text { color: var(--ink2); }
+.sel-text b { color: var(--pri-hi); }
+
+/* Section heading */
+.section-over { font-size: 12px; font-weight: 800; color: var(--ink2); margin-top: 20px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.section-over.red { color: #f87171; }
+
+/* Details / accordion */
+details summary {
+  cursor: pointer; list-style: none; display: flex; align-items: center; gap: 8px;
+  color: var(--ink2); font-size: 12px; font-weight: 600; padding: 8px 0;
+}
+details summary::-webkit-details-marker { display: none; }
+details[open] summary { color: var(--pri-hi); }
+
+/* ═══════════════════════════════════════════════════ RESULTS HEADER */
+.results-count {
+  font-size: 12px; color: var(--ink3); font-weight: 600;
+  margin-top: 16px; margin-bottom: 4px;
+  display: flex; align-items: center; gap: 6px;
+}
+.results-count .num {
+  font-size: 20px; font-weight: 900; color: var(--ink); font-family: 'Outfit', sans-serif;
+}
+
+/* ═══════════════════════════════════════════════════ UTIL */
+.hidden { display: none !important; }
+.mut { color: var(--ink2); }
+.muted { color: var(--ink3); }
+.small { font-size: 12px; }
+.mt4 { margin-top: 4px; }
+.mt8 { margin-top: 8px; }
+.mt12 { margin-top: 12px; }
+.flex { display: flex; }
+.gap8 { gap: 8px; }
+.items-center { align-items: center; }
+.ml-auto { margin-left: auto; }
+.fw { font-weight: 700; }
+.line-clamp { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+
+/* ═══════════════════════════════════════════════════ FADE-IN */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.offer, .hotel-card { animation: fadeUp 0.35s ease both; }
+.offer:nth-child(2) { animation-delay: 0.05s; }
+.offer:nth-child(3) { animation-delay: 0.1s; }
+.offer:nth-child(4) { animation-delay: 0.15s; }
+.offer:nth-child(5) { animation-delay: 0.2s; }
+.hotel-card:nth-child(2) { animation-delay: 0.05s; }
+.hotel-card:nth-child(3) { animation-delay: 0.1s; }
+.hotel-card:nth-child(4) { animation-delay: 0.15s; }
+.hotel-card:nth-child(5) { animation-delay: 0.2s; }
+
+/* ═══════════════════════════════════════════════════ RESPONSIVE */
+@media (max-width: 640px) {
+  header { padding: 0 14px; }
+  main { padding: 16px 12px 40px; }
+  .flight-iata { font-size: 22px; }
+  .price { font-size: 24px; }
+  .card { padding: 18px; }
+  .offer-inner { padding: 14px 16px; }
+  .offer-footer { padding: 10px 14px 12px; }
+  .hotel-body { padding: 14px 16px; }
+  .hotel-actions { padding: 10px 14px 12px; }
+}
+
+    /* Budget validation */
+    .problem-box { background: #fef3c7; border: 1.5px solid #f59e0b; border-radius: 10px; padding: 14px 18px; margin: 8px 0; }
+    .problem-box strong { color: #92400e; display: block; margin-bottom: 4px; font-size: 0.95rem; }
+    .problem-box p { color: #78350f; margin: 0; font-size: 0.88rem; }
+
+  
+    /* Live budget tracker */
+    .budget-tracker { position: sticky; top: 0; z-index: 100; background: linear-gradient(135deg,#1e293b,#0f172a); border-bottom: 2px solid #3b82f6; padding: 10px 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; font-size: 0.82rem; color: #94a3b8; }
+    .budget-tracker .bt-label { color: #cbd5e1; font-weight: 600; }
+    .budget-tracker .bt-item { display: flex; align-items: center; gap: 6px; }
+    .budget-tracker .bt-amt { font-weight: 700; color: #f8fafc; }
+    .budget-tracker .bt-remaining.ok { color: #34d399; }
+    .budget-tracker .bt-remaining.warn { color: #fbbf24; }
+    .budget-tracker .bt-remaining.over { color: #f87171; }
+    .budget-tracker input#totalBudget { background: #1e293b; border: 1.5px solid #3b82f6; border-radius: 8px; color: #f8fafc; padding: 4px 10px; width: 140px; font-size: 0.82rem; }
+    .budget-tracker input#totalBudget::placeholder { color: #475569; }
+
+  </style>
+</head>
+<body>
+
+<!-- Animated background layers -->
+<div class="bg-canvas"></div>
+<div class="grid-lines"></div>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">✈</div>
+      <div class="logo-text">
+        <h1>TravelAI <span>Pro</span></h1>
+        <div class="header-sub">Real-time Indian domestic flights · Hotels · AI day plans</div>
+      </div>
+    </div>
+    <div class="ver-badge" id="ver">Connecting…</div>
+  </div>
+</header>
+
+<!-- Live budget tracker bar -->
+<div class="budget-tracker" id="budgetTracker" style="display:none">
+  <span class="bt-label">&#x1F4B0; Trip Budget:</span>
+  <input type="number" id="totalBudget" placeholder="Set total budget (&#x20B9;)" min="1" oninput="updateBudgetTracker()">
+  <span class="bt-item">&#x2708;&#xFE0F; Flights: <span class="bt-amt" id="btFlight">—</span></span>
+  <span class="bt-item">&#x1F3E8; Hotels: <span class="bt-amt" id="btHotel">—</span></span>
+  <span class="bt-item">Remaining: <span class="bt-amt bt-remaining" id="btRemain">—</span></span>
+</div>
+
+
+<!-- Step navigation -->
+<nav class="step-nav" aria-label="Sections">
+  <div class="step-nav-inner">
+    <a class="step-tab" href="#sec-providers">
+      <span class="step-num">🔌</span> API Status
+    </a>
+    <a class="step-tab" href="#sec-flights" id="tab-flights">
+      <span class="step-num">1</span> Flights
+    </a>
+    <a class="step-tab" href="#sec-hotels" id="tab-hotels">
+      <span class="step-num">2</span> Hotels
+    </a>
+    <a class="step-tab" href="#sec-itinerary" id="tab-itin">
+      <span class="step-num">3</span> Day Plan
+    </a>
+    <a class="step-tab" href="#sec-summary" id="tab-summary">
+      <span class="step-num">4</span> Summary
+    </a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ══════════════════════════════════ PROVIDER STATUS -->
+  <section class="card" id="sec-providers">
+    <div class="card-header">
+      <div class="card-icon blue">🔌</div>
+      <div>
+        <div class="card-title">Data sources &amp; API status</div>
+        <div class="card-sub">LIVE = real provider request · CACHED = earlier response · ESTIMATE = AI, not a quote</div>
+      </div>
+      <button class="btn btn-outline btn-sm ml-auto" id="checkBtn">Test connections</button>
+    </div>
+    <div id="prov" class="prov-grid">
+      <div class="loading-state"><span class="spin"></span> Loading provider status…</div>
+    </div>
+    <div class="mt8 small mut" id="checkOut"></div>
+  </section>
+
+  <!-- ══════════════════════════════════ FLIGHTS -->
+  <section class="card" id="sec-flights">
+    <div class="card-header">
+      <div class="card-icon blue">✈️</div>
+      <div>
+        <div class="card-title">1 · Flights — Agent 1</div>
+        <div class="card-sub">Live fares from Google Flights via SerpAPI (real-time prices)</div>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <label class="field">
+        <span class="field-label">From (city or airport code)</span>
+        <input id="origin" value="Chennai" placeholder="e.g. Chennai, BOM">
+      </label>
+      <label class="field">
+        <span class="field-label">To (city or airport code)</span>
+        <input id="destination" value="Goa" placeholder="e.g. Goa, DEL">
+      </label>
+      <label class="field">
+        <span class="field-label">Departure date</span>
+        <input id="dep" type="date">
+      </label>
+      <label class="field">
+        <span class="field-label">Return date (blank = one-way)</span>
+        <input id="ret" type="date">
+      </label>
+      <label class="field">
+        <span class="field-label">Adults</span>
+        <input id="adults" type="number" min="1" max="9" value="1">
+      </label>
+      <label class="field">
+        <span class="field-label">Children</span>
+        <input id="children" type="number" min="0" max="8" value="0">
+      </label>
+      <label class="field">
+        <span class="field-label">Cabin class</span>
+        <select id="cabin">
+          <option value="economy">Economy</option>
+          <option value="premium_economy">Premium Economy</option>
+          <option value="business">Business</option>
+          <option value="first">First</option>
+        </select>
+      </label>
+      <label class="field">
+        <span class="field-label">Budget per person (₹)</span>
+        <input id="fbudget" type="number" min="1" placeholder="optional">
+      </label>
+      <label class="field">
+        <span class="field-label">Budget scope</span>
+        <select id="fscope">
+          <option value="per_passenger">Per passenger</option>
+          <option value="total">Total, all passengers</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="row">
+      <label class="checkbox-row">
+        <input type="checkbox" id="nonstop"> Non-stop only
+      </label>
+      <button id="fBtn" class="btn btn-primary">🔍 Search flights</button>
+    </div>
+    <div id="fOut"></div>
+  </section>
+
+  <!-- ══════════════════════════════════ HOTELS -->
+  <section class="card" id="sec-hotels">
+    <div class="card-header">
+      <div class="card-icon purple">🏨</div>
+      <div>
+        <div class="card-title">2 · Hotels — Agent 2</div>
+        <div class="card-sub">Live rates from Google Hotels via SerpAPI</div>
+      </div>
+    </div>
+    <div class="grid-3">
+      <label class="field">
+        <span class="field-label">Destination (defaults to flight destination)</span>
+        <input id="hdest" placeholder="e.g. Goa, Mumbai">
+      </label>
+      <label class="field">
+        <span class="field-label">Check-in date</span>
+        <input id="cin" type="date" onchange="var co=$(&apos;cout&apos;); if(co.value&&co.value<this.value)co.value=&apos;&apos;; co.min=this.value;">
+      </label>
+      <label class="field">
+        <span class="field-label">Check-out date</span>
+        <input id="cout" type="date">
+      </label>
+      <label class="field">
+        <span class="field-label">Rooms</span>
+        <input id="rooms" type="number" min="1" max="6" value="1">
+      </label>
+      <label class="field">
+        <span class="field-label">Budget (₹)</span>
+        <input id="hbudget" type="number" min="1" placeholder="optional">
+      </label>
+      <label class="field">
+        <span class="field-label">Budget scope</span>
+        <select id="hscope">
+          <option value="per_night">Per night</option>
+          <option value="total_stay">Total for the stay</option>
+        </select>
+      </label>
+      <label class="field">
+        <span class="field-label">Min star rating</span>
+        <select id="stars">
+          <option value="">Any stars</option>
+          <option>3</option><option>4</option><option>5</option>
+        </select>
+      </label>
+      <label class="field">
+        <span class="field-label">Free cancellation</span>
+        <label class="checkbox-row" style="margin-top:10px">
+          <input type="checkbox" id="freecanc"> Free cancellation only
+        </label>
+      </label>
+      <label class="field" style="display:flex;flex-direction:column;justify-content:flex-end">
+        <button id="hBtn" class="btn btn-primary" style="background:linear-gradient(135deg,var(--purple),#7c3aed);box-shadow:0 4px 18px rgba(139,92,246,0.35)">🔍 Search hotels</button>
+      </label>
+    </div>
+    <div id="hOut"></div>
+  </section>
+
+  <!-- ══════════════════════════════════ ITINERARY -->
+  <section class="card" id="sec-itinerary">
+    <div class="card-header">
+      <div class="card-icon cyan">🗓️</div>
+      <div>
+        <div class="card-title">3 · 12-hour Day Plan — Agent 3</div>
+        <div class="card-sub">AI-researched activities · costs are estimates, not quotes</div>
+      </div>
+    </div>
+    <div class="sel-bar">
+      <span class="sel-text">Selected: <b id="selInfo">nothing yet</b></span>
+      <button class="btn btn-outline btn-sm" id="clearSel">Clear selection</button>
+    </div>
+    <div class="grid-3 mt12">
+      <label class="field">
+        <span class="field-label">Destination (defaults to flight destination)</span>
+        <input id="idest" placeholder="e.g. Goa">
+      </label>
+      <label class="field">
+        <span class="field-label">Day to plan</span>
+        <input id="idate" type="date">
+      </label>
+      <label class="field">
+        <span class="field-label">Start time</span>
+        <input id="istart" type="time" value="08:00">
+      </label>
+      <label class="field">
+        <span class="field-label">Pace</span>
+        <select id="pace">
+          <option>balanced</option>
+          <option>relaxed</option>
+          <option>packed</option>
+        </select>
+      </label>
+      <label class="field">
+        <span class="field-label">Daily budget per person (₹)</span>
+        <input id="ibudget" type="number" min="1" placeholder="optional">
+      </label>
+      <label class="field">
+        <span class="field-label">Food preference</span>
+        <input id="diet" placeholder="e.g. vegetarian">
+      </label>
+      <label class="field">
+        <span class="field-label">Mobility needs</span>
+        <input id="mob" placeholder="e.g. avoid long walks">
+      </label>
+    </div>
+    <div class="interest-chips" id="interests"></div>
+    <div class="row">
+      <button id="iBtn" class="btn btn-primary" style="background: linear-gradient(135deg,var(--cyan),#0284c7); box-shadow:0 4px 18px rgba(6,182,212,0.35)">✨ Create day plan</button>
+    </div>
+    <div id="iOut"></div>
+  </section>
+
+  <!-- ══════════════════════════════════ SUMMARY -->
+  <section class="card" id="sec-summary">
+    <div class="card-header">
+      <div class="card-icon green">💰</div>
+      <div>
+        <div class="card-title">4 · Trip Summary &amp; Budget</div>
+        <div class="card-sub">Combines your selected flight + hotel + day plan estimate</div>
+      </div>
+    </div>
+    <div class="row">
+      <label class="field" style="flex:1;max-width:300px">
+        <span class="field-label">Overall trip budget (₹)</span>
+        <input id="obudget" type="number" min="1" placeholder="optional">
+      </label>
+      <button id="sBtn" class="btn btn-primary" style="background: linear-gradient(135deg,var(--green),#059669); box-shadow:0 4px 18px rgba(16,185,129,0.35)">📊 Build summary</button>
+    </div>
+    <div id="sOut"></div>
+  </section>
+
+</main>
+
+<script>
+// ═══════════════════════════════════ UTILS
+const $ = id => document.getElementById(id);
+const S = { flight: null, hotel: null, itin: null, flightMeta: null, hotelMeta: null };
+
+const money = (n, c) => {
+  try {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency', currency: c || 'INR', maximumFractionDigits: 0
+    }).format(n);
+  } catch { return n + ' ' + (c || ''); }
+};
+const dFmt = s => s ? new Date(s + 'T00:00:00').toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
+const dur = m => m ? `${Math.floor(m / 60)}h ${m % 60}m` : '';
+
+// ─── DOM builder
+function h(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (k === 'class') e.className = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (v !== null && v !== undefined) e.setAttribute(k, v);
+  }
+  for (const k of kids.flat())
+    if (k !== null && k !== undefined && k !== false)
+      e.append(k.nodeType ? k : document.createTextNode(String(k)));
+  return e;
+}
+
+function safeLink(url, text, cls) {
+  let ok = false;
+  try { const u = new URL(url); ok = (u.protocol === 'https:' || u.protocol === 'http:') && !u.username; } catch {}
+  if (!ok) return null;
+  return h('a', { href: url, target: '_blank', rel: 'noopener noreferrer nofollow', class: cls || '' }, text);
+}
+
+function safeBookBtn(url, label, cls) {
+  // Returns an anchor styled as a CTA button, or null
+  let ok = false;
+  try { const u = new URL(url); ok = (u.protocol === 'https:' || u.protocol === 'http:') && !u.username; } catch {}
+  if (!ok) return null;
+  return h('a', { href: url, target: '_blank', rel: 'noopener noreferrer nofollow', class: 'btn-book ' + (cls || '') }, label);
+}
+
+const KIND = {
+  LIVE_API: 'b-LIVE_API', LIVE: 'b-LIVE', SANDBOX: 'b-SANDBOX', CACHED: 'b-CACHED',
+  ESTIMATE: 'b-ESTIMATE', ESTIMATED: 'b-ESTIMATED',
+  AI_GENERATED: 'b-AI_GENERATED', UNAVAILABLE: 'b-UNAVAILABLE',
+  WEB_RESEARCH: 'b-WEB_RESEARCH', WEB: 'b-WEB'
+};
+const badge = (k, text) => h('span', { class: 'badge ' + (KIND[k] || 'b-UNAVAILABLE') }, text || k || 'UNKNOWN');
+const banner = (cls, icon, ...t) => h('div', { class: 'banner ' + cls }, h('span', { class: 'banner-icon' }, icon), h('div', {}, ...t));
+
+// ─── API call
+async function api(path, body) {
+  let r;
+  try {
+    r = await fetch(path, {
+      method: body ? 'POST' : 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      body: body ? JSON.stringify(body) : undefined
+    });
+  } catch { return { status: 'error', message: 'Cannot reach the TravelAI backend. Is it running?' }; }
+  let j = {};
+  try { j = await r.json(); } catch {}
+  if (r.status === 422 && Array.isArray(j.detail))
+    return { status: 'invalid', message: j.detail.map(d => (d.loc || []).slice(-1) + ': ' + d.msg.replace('Value error, ', '')).join('; ') };
+  if (!j.status) j.status = r.ok ? 'ok' : 'error';
+  return j;
+}
+
+// ═══════════════════════════════════ FLIGHT TIME DISPLAY
+const dtl = o => o.local_dep_label && o.local_arr_label
+  ? `${o.local_dep_label} → ${o.local_arr_label}` + (o.arrival_day_offset ? ` (+${o.arrival_day_offset}d)` : '')
+  : '';
+
+// ═══════════════════════════════════ BOOKING STRIP BUILDER
+// Builds the prominent booking-link row for flight or hotel cards
+function buildBookingStrip(o, searchUrl, isFlight) {
+  const strip = h('div', { class: 'booking-strip', style: 'display:flex;flex-wrap:wrap;gap:8px;align-items:center' });
+
+  if (isFlight) {
+    const openUrl = o.open_search_url || o.search_url || searchUrl;
+    if (openUrl) {
+      const openBtn = safeBookBtn(openUrl, o.open_search_label || 'Open Flight Search ↗', '');
+      if (openBtn) strip.append(openBtn);
+    }
+    if (o.booking_url && o.link_kind === 'offer') {
+      const btn = safeBookBtn(o.booking_url, '🎫 Book this flight ↗', '');
+      if (btn) strip.append(h('span', { class: 'badge b-direct' }, '✓ DIRECT OFFER'), btn);
+    }
+    if (o.airline_url) {
+      const aBtn = safeBookBtn(o.airline_url, '✈ Official Airline Site ↗', 'search-cta');
+      if (aBtn) strip.append(aBtn);
+    }
+    if (o.aggregator_url) {
+      const mmtBtn = safeLink(o.aggregator_url, 'MakeMyTrip Search ↗', 'small mut');
+      if (mmtBtn) strip.append(h('span', { class: 'booking-divider' }, '·'), mmtBtn);
+    }
+    const url = o.search_url || searchUrl;
+    if (url && url !== openUrl) {
+      const gBtn = safeLink(url, 'Google Flights ↗', 'small mut');
+      if (gBtn) strip.append(h('span', { class: 'booking-divider' }, '·'), gBtn);
+    }
+    (o.search_links || []).slice(0, 5).forEach(item => {
+      if (!item || !item.url || item.url === openUrl || item.url === url || item.url === o.aggregator_url || item.url === o.airline_url) return;
+      const extra = safeLink(item.url, (item.label || 'Search') + ' ↗', 'small mut');
+      if (extra) strip.append(h('span', { class: 'booking-divider' }, '·'), extra);
+    });
+  } else {
+    if (o.official_website) {
+      const offBtn = safeBookBtn(o.official_website, '🌐 Official Hotel Website ↗', 'btn-official');
+      if (offBtn) {
+        strip.append(h('span', { class: 'badge b-direct', style: 'background:#059669;color:#fff' }, '✓ OFFICIAL SITE'), offBtn);
+      }
+    }
+    if (o.booking_url && o.booking_url !== o.official_website) {
+      const bBtn = safeBookBtn(o.booking_url, '🏨 Provider Booking Page ↗', '');
+      if (bBtn) strip.append(bBtn);
+    }
+    if (o.booking_search_url) {
+      const bk = safeBookBtn(o.booking_search_url, 'Open on Booking.com ↗', 'search-cta');
+      if (bk) strip.append(bk);
+    }
+    const url = o.search_url || searchUrl;
+    if (url) {
+      const sBtn = safeBookBtn(url, '🔍 Search on Google Hotels ↗', 'search-cta');
+      if (sBtn) strip.append(sBtn);
+    }
+  }
+  return strip;
+}
+
+// ═══════════════════════════════════ FLIGHT CARD
+function flightCard(o, meta, over) {
+  const stops = o.stops === 0 ? 'Non-stop' : `${o.stops} stop${o.stops > 1 ? 's' : ''}`;
+  const airlines = (o.airlines || []).join(' + ') || 'Flight';
+  const nums = (o.flight_numbers || []).join(', ');
+
+  const card = h('div', { class: 'offer' + (over ? ' over-budget' : ''), 'data-k': 'flight', 'data-id': o.id });
+  card.append(h('div', { class: 'offer-accent' }));
+
+  const inner = h('div', { class: 'offer-inner' });
+
+  // Airline header
+  const airlineRow = h('div', { class: 'flex gap8 items-center', style: 'flex-wrap:wrap;margin-bottom:4px' });
+  if (o.airline_logo) {
+    const img = h('img', { src: o.airline_logo, class: 'airline-logo', alt: airlines });
+    img.onerror = () => img.remove();
+    airlineRow.append(img);
+  }
+  airlineRow.append(h('div', {}, h('div', { class: 'airline-name' }, airlines), h('div', { class: 'flight-num' }, nums)));
+  if (over) airlineRow.append(badge('b-OVER', '⚡ OVER BUDGET'));
+  inner.append(airlineRow);
+
+  // Route row with price
+  const topFlex = h('div', { class: 'flight-top' });
+  const leftSide = h('div', { style: 'flex:1;min-width:0' });
+
+  const routeRow = h('div', { class: 'flight-route' });
+  const dep = h('div', {},
+    h('div', { class: 'flight-iata' }, o.origin_iata || '—'),
+    h('div', { class: 'flight-city mut' }, o.local_dep_label || '')
+  );
+  const arr = h('div', { style: 'text-align:right' },
+    h('div', { class: 'flight-iata' }, o.destination_iata || '—'),
+    h('div', { class: 'flight-city mut' }, o.local_arr_label || (o.arrival_day_offset ? `+${o.arrival_day_offset}d` : ''))
+  );
+  const mid = h('div', { class: 'flight-arrow' });
+  mid.append(
+    h('div', { class: 'flight-stops' }, dur(o.duration_min)),
+    h('div', { class: 'flight-line' }),
+    h('div', { class: 'flight-stops' }, stops)
+  );
+  routeRow.append(dep, mid, arr);
+  leftSide.append(routeRow);
+
+  const priceBlock = h('div', { class: 'price-block' });
+  if (o.price_per_person != null) {
+    priceBlock.append(
+      h('div', { class: 'price' }, money(o.price_per_person, o.currency)),
+      h('div', { class: 'price-label' }, 'per passenger')
+    );
+  } else {
+    priceBlock.append(h('div', { class: 'price-dash' }, '—'), h('div', { class: 'price-label' }, 'price unavailable'));
+  }
+
+  topFlex.append(leftSide, priceBlock);
+  inner.append(topFlex);
+
+  // Details chips
+  const chips = h('div', { class: 'flight-details' });
+  if (o.stops === 0) chips.append(h('span', { class: 'chip green' }, '✈ Non-stop'));
+  if (o.cabin) chips.append(h('span', { class: 'chip blue' }, o.cabin));
+  if (o.baggage) chips.append(h('span', { class: 'chip' }, '🧳 ' + o.baggage));
+  (o.layovers || []).forEach(l => chips.append(h('span', { class: 'chip amber' }, `⏳ ${l.iata} ${l.duration_min ? dur(l.duration_min) : ''} layover`)));
+  inner.append(chips);
+
+  if (o.price_note) inner.append(h('div', { class: 'small muted mt4' }, o.price_note));
+
+  card.append(inner);
+
+  // Footer with booking strip + actions
+  const footer = h('div', { class: 'offer-footer' });
+  const left = h('div', { class: 'offer-footer-left' });
+  left.append(buildBookingStrip(o, meta.search_url, true));
+  footer.append(left);
+
+  const right = h('div', { class: 'offer-footer-right' });
+  right.append(badge(meta.data_kind));
+  if (o.source) right.append(h('span', { class: 'source-note' }, o.source));
+  if (o.retrieved_at) right.append(h('span', { class: 'source-note' }, o.retrieved_at.slice(0, 10)));
+  right.append(h('button', { class: 'btn btn-outline btn-sm', onclick: () => select('flight', o, meta) }, 'Select ✓'));
+  footer.append(right);
+  card.append(footer);
+  return card;
+}
+
+// ═══════════════════════════════════ HOTEL CARD
+function hotelCard(o, meta, over) {
+  const card = h('div', { class: 'hotel-card' + (over ? ' over-budget' : ''), 'data-k': 'hotel', 'data-id': o.id });
+
+  // Thumbnail
+  if (o.thumbnail) {
+    const wrap = h('div', { class: 'hotel-thumb-wrap' });
+    const img = h('img', { src: o.thumbnail, class: 'hotel-thumb', alt: o.name, loading: 'lazy' });
+    img.onerror = () => wrap.replaceWith(h('div', { class: 'hotel-thumb-placeholder' }, '🏨'));
+    wrap.append(img);
+    card.append(wrap);
+  } else {
+    card.append(h('div', { class: 'hotel-thumb-placeholder' }, '🏨'));
+  }
+
+  const body = h('div', { class: 'hotel-body' });
+
+  // Top: name + rating
+  const top = h('div', { class: 'hotel-top' });
+  const left = h('div', { style: 'flex:1;min-width:0' });
+  left.append(h('div', { class: 'hotel-name' }, o.name));
+  if (o.star_rating) left.append(h('div', { class: 'hotel-stars' }, '★'.repeat(o.star_rating) + '☆'.repeat(5 - o.star_rating)));
+  if (o.location) left.append(h('div', { class: 'hotel-location' }, '📍 ' + o.location));
+  top.append(left);
+
+  if (o.guest_rating) {
+    const ratingBlock = h('div', { class: 'hotel-rating' });
+    ratingBlock.append(h('div', { class: 'rating-num' }, o.guest_rating.toFixed(1)));
+    ratingBlock.append(h('div', { class: 'rating-label' }, o.reviews ? `${o.reviews.toLocaleString()} reviews` : 'rating'));
+    top.append(ratingBlock);
+  }
+  body.append(top);
+
+  // Amenities
+  if (o.amenities && o.amenities.length) {
+    const am = h('div', { class: 'hotel-amenities' });
+    o.amenities.slice(0, 8).forEach(a => am.append(h('span', { class: 'chip' }, a)));
+    body.append(am);
+  }
+
+  // Cancellation
+  if (o.cancellation) body.append(h('div', { class: 'small mt8', style: 'color:#34d399' }, '✓ ' + o.cancellation));
+
+  // Price block
+  const footer = h('div', { class: 'hotel-footer' });
+  const priceBlock = h('div', { class: 'hotel-price-block' });
+  if (o.price_per_night != null) {
+    priceBlock.append(h('div', { class: 'hotel-price' }, money(o.price_per_night, o.currency)));
+    priceBlock.append(h('div', { class: 'hotel-price-night' }, 'per night'));
+    if (o.total_price != null) priceBlock.append(h('div', { class: 'hotel-total' }, 'Stay total: ' + money(o.total_price, o.currency)));
+  } else {
+    priceBlock.append(h('div', { class: 'hotel-price', style: 'color:var(--ink3)' }, '—'));
+  }
+  if (over) priceBlock.append(badge('b-OVER', '⚡ OVER BUDGET'));
+
+  // Left side of footer: booking strip
+  const footLeft = h('div', {});
+  footLeft.append(buildBookingStrip(o, meta.search_url, false));
+
+  footer.append(footLeft, priceBlock);
+  body.append(footer);
+
+  card.append(body);
+
+  // Actions row
+  const actions = h('div', { class: 'hotel-actions' });
+  const actLeft = h('div', { class: 'hotel-actions-left' });
+  actLeft.append(badge(meta.data_kind));
+  if (o.price_note) actLeft.append(h('span', { class: 'source-note' }, o.price_note.slice(0, 80)));
+  actions.append(actLeft);
+
+  const actRight = h('div', { class: 'hotel-actions-right' });
+  actRight.append(h('button', { class: 'btn btn-outline btn-sm', onclick: () => select('hotel', o, meta) }, 'Select ✓'));
+  actions.append(actRight);
+  card.append(actions);
+
+  return card;
+}
+
+// ═══════════════════════════════════ RENDER OFFERS
+function renderOffers(out, j, cardFn, noun) {
+  out.replaceChildren();
+  const meta = { data_kind: j.data_kind, search_url: j.search_url };
+
+  const cls = j.status === 'ok' ? 'ok' : 'warn';
+  const icon = j.status === 'ok' ? '✅' : '⚠️';
+  const prov = h('b', {}, j.provider || '');
+  out.append(banner(cls, icon, prov, ' · ', badge(j.data_kind), ' · ', h('span', {}, j.message || '')));
+
+  (j.notes || []).forEach(n => out.append(h('div', { class: 'small mut mt4' }, 'ℹ ' + n)));
+
+  if (j.searched_airports) {
+    const fmt = a => a.map(x => x.iata + (x.distance_km ? ` (~${Math.round(x.distance_km)} km)` : '')).join(', ');
+    out.append(h('div', { class: 'small mut mt4' }, `🗺 Airports: ${fmt(j.searched_airports.origin)} → ${fmt(j.searched_airports.destination)}`));
+  }
+
+  // Results count
+  const total = (j.options || []).length;
+  if (total > 0) {
+    const counter = h('div', { class: 'results-count' });
+    counter.append(h('span', { class: 'num' }, String(total)), ` ${noun}${total !== 1 ? 's' : ''} found`);
+    if (j.search_url) {
+      const a = safeLink(j.search_url, 'View all on Google ↗', 'small');
+      if (a) { counter.append(h('span', {}, ' · '), a); }
+    }
+    out.append(counter);
+  }
+
+  (j.options || []).forEach(o => out.append(cardFn(o, meta, false)));
+
+  if (j.over_budget && j.over_budget.length) {
+    out.append(h('div', { class: 'section-over red', style: 'margin-top:20px' }, `⚡ Nearest over-budget ${noun}s`));
+    j.over_budget.forEach(o => out.append(cardFn(o, meta, true)));
+  }
+
+  if (j.excluded && j.excluded.length)
+    out.append(h('p', { class: 'small mut mt8' }, `${j.excluded.length} offer(s) excluded (different currency or no price).`));
+
+  // Bottom search link
+  if (j.search_url && total === 0) {
+    const a = safeLink(j.search_url, (j.search_url_label || 'Open search page') + ' ↗');
+    if (a) out.append(h('div', { class: 'mt8 small' }, a));
+  }
+}
+
+// ═══════════════════════════════════ PROBLEM STATE
+function problem(out, j, retry) {
+  out.replaceChildren();
+  const cls = j.status === 'unavailable' || j.status === 'error' ? 'err' : 'warn';
+  const icon = cls === 'err' ? '❌' : '⚠️';
+  out.append(banner(cls, icon, h('div', {}, h('b', {}, j.message || 'Something went wrong.'))));
+
+  if (j.candidates && j.candidates.length)
+    out.append(h('div', { class: 'small mut mt8' }, 'Did you mean: ' + j.candidates.join(' · ')));
+
+  if (j.open_search_url) {
+    const btn = safeBookBtn(j.open_search_url, 'Open Flight Search ↗', '');
+    if (btn) out.append(h('div', { class: 'mt8' }, btn));
+  }
+  if (j.search_url) {
+    const btn = safeBookBtn(j.search_url, (j.search_url_label || 'Search page') + ' ↗', 'search-cta');
+    if (btn) out.append(h('div', { class: 'mt8' }, btn));
+  }
+  if (j.booking_search_url) {
+    const btn = safeBookBtn(j.booking_search_url, 'Search hotels on Booking.com ↗', 'search-cta');
+    if (btn) out.append(h('div', { class: 'mt8' }, btn));
+  }
+
+  if (Array.isArray(j.flight_search_links) && j.flight_search_links.length) {
+    out.append(h('div', { class: 'section-over', style: 'margin-top:14px' }, '🔗 Web-researched flight search pages'));
+    out.append(h('div', { class: 'small mut mt4' }, j.flight_search_links_label || 'These links are web pages to check — not confirmed flight offers.'));
+    j.flight_search_links.forEach((item, i) => {
+      const card = h('div', { class: 'link-card' });
+      const a = safeLink(item.url, `${i + 1}. ${item.title || 'Flight search page'} ↗`);
+      if (a) {
+        card.append(a);
+        if (item.snippet) card.append(h('div', { class: 'link-snippet' }, item.snippet.slice(0, 300)));
+        card.append(h('div', { class: 'small mut mt4' }, 'Source: Tavily web research · fare not confirmed'));
+        out.append(card);
+      }
+    });
+  }
+
+  out.append(h('div', { class: 'row' }, h('button', { class: 'btn btn-outline', onclick: retry }, '↺ Retry')));
+}
+
+// ═══════════════════════════════════ SELECT
+function select(kind, o, meta) {
+  S[kind] = o; S[kind + 'Meta'] = meta;
+  updSel();
+  if (typeof updateBudgetTracker === 'function') updateBudgetTracker();
+  document.querySelectorAll(`.offer[data-k="${kind}"], .hotel-card[data-k="${kind}"]`).forEach(e => {
+    e.classList.toggle('sel', e.dataset.id === o.id);
+  });
+  if (kind === 'flight') {
+    if (!$('hdest').value) {
+      const city = o.destination_city || (o.destination_name || '').replace(/\s+(international\s+)?airport$/i, '').trim() || o.destination_iata || '';
+      $('hdest').value = city;
+      $('hdest').placeholder = city;
+    }
+    if (!$('idest').value) $('idest').placeholder = o.destination_city || o.destination_name || '';
+  }
+}
+function updSel() {
+  const p = [];
+  if (S.flight) p.push('✈ ' + (S.flight.flight_numbers || []).join('+') + ' ' + S.flight.origin_iata + '→' + S.flight.destination_iata);
+  if (S.hotel) p.push('🏨 ' + S.hotel.name);
+  $('selInfo').textContent = p.join('  ·  ') || 'nothing yet';
+}
+$('clearSel').onclick = () => {
+  S.flight = S.hotel = null;
+  document.querySelectorAll('.offer.sel, .hotel-card.sel').forEach(e => e.classList.remove('sel'));
+  updSel();
+};
+
+// ═══════════════════════════════════ FLIGHT SEARCH
+async function doFlights() {
+  const out = $('fOut'), b = $('fBtn');
+  b.disabled = true;
+  out.replaceChildren(h('div', { class: 'loading-state' }, h('span', { class: 'spin' }), h('span', {}, 'Searching live flight prices', h('span', { class: 'loading-dots' }))));
+  const body = {
+    origin: $('origin').value.trim(),
+    destination: $('destination').value.trim(),
+    departure_date: $('dep').value,
+    return_date: $('ret').value || null,
+    adults: +$('adults').value,
+    children: +$('children').value,
+    cabin: $('cabin').value,
+    budget: $('fbudget').value ? +$('fbudget').value : null,
+    budget_scope: $('fscope').value,
+    nonstop_only: $('nonstop').checked,
+    currency: 'INR'
+  };
+  const j = await api('/api/flights/search', body);
+  b.disabled = false;
+  if (['ok', 'no_results'].includes(j.status) && ((j.options || []).length || (j.over_budget || []).length)) {
+    renderOffers(out, j, flightCard, 'flight');
+    markTabDone('tab-flights');
+  } else {
+    problem(out, j, doFlights);
+  }
+  S.flight = null; updSel();
+  out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ═══════════════════════════════════ HOTEL SEARCH
+async function doHotels() {
+  const out = $('hOut'), b = $('hBtn');
+  b.disabled = true;
+  out.replaceChildren(h('div', { class: 'loading-state' }, h('span', { class: 'spin' }), h('span', {}, 'Searching live hotel rates', h('span', { class: 'loading-dots' }))));
+  const dest = $('hdest').value.trim() || (S.flight && (S.flight.destination_city || S.flight.destination_iata)) || $('destination').value.trim();
+  if (!dest) {
+    b.disabled = false;
+    out.replaceChildren(h('div', { class: 'problem-box' },
+      h('strong', {}, '⚠ Destination required'),
+      h('p', {}, 'Please enter a city, state or country in the "Destination" field above before searching for hotels.')
+    ));
+    $('hdest').focus();
+    return;
+  }
+  const checkout = $('cout').value;
+  if (!checkout) {
+    b.disabled = false;
+    out.replaceChildren(h('div', { class: 'problem-box' },
+      h('strong', {}, '⚠ Check-out date required'),
+      h('p', {}, 'Please select a check-out date before searching for hotels.')
+    ));
+    $('cout').focus();
+    return;
+  }
+  const body = {
+    destination: dest,
+    check_in: $('cin').value || (S.flight ? null : $('dep').value),
+    check_out: $('cout').value,
+    adults: +$('adults').value,
+    children: +$('children').value,
+    rooms: +$('rooms').value,
+    budget: $('hbudget').value ? +$('hbudget').value : null,
+    budget_scope: $('hscope').value,
+    stars: $('stars').value ? Array.from({ length: 6 - +$('stars').value }, (_, i) => +$('stars').value + i) : [],
+    free_cancellation: $('freecanc').checked,
+    flight_id: S.flight ? S.flight.id : null,
+    currency: 'INR'
+  };
+  const j = await api('/api/hotels/search', body);
+  b.disabled = false;
+  if (['ok', 'no_results'].includes(j.status) && ((j.options || []).length || (j.over_budget || []).length)) {
+    renderOffers(out, j, hotelCard, 'hotel');
+    markTabDone('tab-hotels');
+  } else {
+    problem(out, j, doHotels);
+  }
+  S.hotel = null; updSel();
+  out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ═══════════════════════════════════ ITINERARY
+const ITEMS = ['beaches','adventure','nature','history','museums','parks','shopping','food','family','spiritual','photography','nightlife'];
+const ICONS = { beaches:'🏖', adventure:'🧗', nature:'🌿', history:'🏛', museums:'🖼', parks:'🌳', shopping:'🛍', food:'🍜', family:'👨‍👩‍👧', spiritual:'🛕', photography:'📸', nightlife:'🌙' };
+ITEMS.forEach(i => {
+  const lbl = h('label', {});
+  const inp = h('input', { type: 'checkbox', value: i });
+  lbl.append(inp, h('span', {}, ICONS[i] || '', ' ', i));
+  $('interests').append(lbl);
+});
+
+async function doItin() {
+  const out = $('iOut'), b = $('iBtn');
+  b.disabled = true;
+  out.replaceChildren(h('div', { class: 'loading-state' }, h('span', { class: 'spin' }), h('span', {}, 'Researching destination & building plan (~30s)', h('span', { class: 'loading-dots' }))));
+  const dest = $('idest').value.trim() || (S.flight && S.flight.destination_name) || $('destination').value.trim();
+  const body = {
+    destination: dest,
+    plan_date: $('idate').value || null,
+    start_time: $('istart').value || '08:00',
+    interests: [...document.querySelectorAll('#interests input:checked')].map(x => x.value),
+    pace: $('pace').value,
+    daily_activity_budget: $('ibudget').value ? +$('ibudget').value : null,
+    dietary: $('diet').value,
+    mobility_needs: $('mob').value,
+    adults: +$('adults').value,
+    flight_id: S.flight ? S.flight.id : null,
+    hotel_id: S.hotel ? S.hotel.id : null,
+    currency: 'INR'
+  };
+  const j = await api('/api/itinerary/generate', body);
+  b.disabled = false;
+  if (j.status !== 'ok' && j.status !== 'partial') { problem(out, j, doItin); return; }
+  S.itin = j;
+  out.replaceChildren();
+  out.append(banner(j.status === 'ok' ? 'ok' : 'warn', '🗓',
+    badge(j.data_kind), ' ', h('span', {}, j.message || '')));
+  out.append(h('div', { class: 'small mut mt4' },
+    `⏰ Window ${j.window.start}–${j.window.end}` +
+    (j.plan_date ? ` on ${dFmt(j.plan_date)}` : '') +
+    (j.uses.flight ? ' · uses your selected flight' : '') +
+    (j.uses.hotel ? ' · uses your selected hotel' : '')));
+  (j.notes || []).forEach(n => out.append(h('div', { class: 'small mut' }, 'ℹ ' + n)));
+
+  const ul = h('ul', { class: 'tl' });
+  j.items.forEach(it => {
+    const li = h('li', {},
+      h('div', { class: 'tl-time' }, `${it.start}–${it.end}`),
+      h('div', { class: 'tl-act' }, it.activity),
+      h('div', { class: 'tl-det' }, [it.location, it.details].filter(Boolean).join(' — ')),
+      it.reason ? h('div', { class: 'tl-det', style: 'color:var(--ink3)' }, 'Why: ' + it.reason) : null,
+      it.transport_note ? h('div', { class: 'tl-transport' }, '🚗 ' + it.transport_note + ' (estimate)') : null,
+      h('div', { class: 'tl-cost' }, `${it.duration_min} min · ` +
+        (it.cost_total ? money(it.cost_total, j.currency) + ' (est)' : 'Free / no cost estimated') +
+        ' · hours unverified'),
+      it.source_url ? h('div', { class: 'small', style: 'margin-top:6px' }, 'Source: ', safeLink(it.source_url, it.source_title || it.source_url) || it.source_url) : null,
+    );
+    ul.append(li);
+  });
+  out.append(ul);
+
+  out.append(h('div', { class: 'mt12' },
+    h('b', {}, 'Estimated day cost: ' + money(j.costs.total, j.currency)),
+    h('span', { class: 'small mut' }, ` (activities ${money(j.costs.activities_total, j.currency)}, meals ${money(j.costs.meals_total, j.currency)}) — AI estimate, not a quote`)));
+
+  if (j.sources && j.sources.length) {
+    const d = h('details', { style: 'margin-top:12px' }, h('summary', {}, `📚 ${j.sources.length} research source(s)`));
+    j.sources.forEach(s => { const a = safeLink(s.url, s.title); if (a) d.append(h('div', { class: 'small mt4' }, a)); });
+    out.append(d);
+  }
+  markTabDone('tab-itin');
+  out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ═══════════════════════════════════ SUMMARY
+async function doSummary() {
+  const out = $('sOut');
+  out.replaceChildren(h('div', { class: 'loading-state' }, h('span', { class: 'spin' }), 'Calculating…'));
+  const j = await api('/api/trip/summary', {
+    flight_id: S.flight ? S.flight.id : null,
+    hotel_id: S.hotel ? S.hotel.id : null,
+    itinerary_id: S.itin ? S.itin.itinerary_id : null,
+    adults: +$('adults').value,
+    children: +$('children').value,
+    rooms: +$('rooms').value,
+    overall_budget: $('obudget').value ? +$('obudget').value : null,
+    currency: 'INR'
+  });
+  if (j.status !== 'ok') { problem(out, j, doSummary); return; }
+  out.replaceChildren();
+  const t = h('table', {},
+    h('tr', {}, h('th', {}, 'Item'), h('th', {}, 'Source'), h('th', { class: 'n' }, 'Amount')));
+  j.lines.forEach(l => t.append(h('tr', {},
+    h('td', {}, l.label),
+    h('td', {}, badge(l.kind), ' ', h('span', { class: 'small mut' }, l.note)),
+    h('td', { class: 'n' }, l.amount != null ? money(l.amount, j.currency) : '—'))));
+  t.append(h('tr', {},
+    h('td', {}, h('b', {}, j.is_partial ? 'Partial total' : (j.is_exact ? 'Total' : 'Estimated total'))),
+    h('td', {}),
+    h('td', { class: 'n' }, h('b', {}, money(j.total, j.currency)))));
+  out.append(t);
+  if (j.is_partial) out.append(banner('warn', '⚠️', 'Partial total — missing: ' + j.partial_reasons.join(', ') + '.'));
+  if (!j.is_exact) out.append(banner('info', 'ℹ️', 'Includes estimates; not all components are provider-priced.'));
+  if (j.remaining != null) out.append(banner(j.over_budget ? 'err' : 'ok', j.over_budget ? '❌' : '✅',
+    j.over_budget ? `Over budget by ${money(-j.remaining, j.currency)}` : `Remaining budget ${money(j.remaining, j.currency)}`));
+  markTabDone('tab-summary');
+}
+
+// ═══════════════════════════════════ PROVIDERS
+function provRow(name, v) {
+  const item = h('div', { class: 'prov-item' });
+  item.append(h('div', { class: 'prov-dot ' + (v.configured ? 'ok' : 'off') }));
+  const txt = h('div', {});
+  txt.append(h('div', { class: 'prov-name' }, name));
+  txt.append(h('div', { class: 'prov-role' }, v.role || ''));
+  item.append(txt, h('span', { class: 'badge ' + (v.configured ? 'b-KEY' : 'b-NOKEY'), style: 'margin-left:auto;flex-shrink:0' }, v.configured ? 'KEY ✓' : 'NO KEY'));
+  return item;
+}
+
+async function loadProv() {
+  const j = await api('/api/providers');
+  const p = $('prov');
+  p.replaceChildren();
+  if (!j.providers) { p.append(banner('err', '❌', j.message || 'Backend unreachable')); return; }
+  Object.entries(j.providers).forEach(([k, v]) => p.append(provRow(v.name || k, v)));
+}
+
+$('checkBtn').onclick = async () => {
+  $('checkOut').textContent = 'Testing connections…';
+  const j = await api('/api/providers/check', {});
+  $('checkOut').textContent = Object.entries(j)
+    .map(([k, v]) => `${k}: ${v.ok === true ? '✅' : v.ok === false ? '❌ ' + (v.message || v.state) : '— ' + v.state}`)
+    .join('  |  ');
+};
+
+// ═══════════════════════════════════ STEP TAB HELPERS
+function markTabDone(tabId) {
+  const t = $(tabId);
+  if (t) {
+    t.classList.add('done');
+    const num = t.querySelector('.step-num');
+    if (num) num.textContent = '✓';
+  }
+}
+
+// ═══════════════════════════════════ WIRE BUTTONS
+$('fBtn').onclick = doFlights;
+$('hBtn').onclick = doHotels;
+$('iBtn').onclick = doItin;
+$('sBtn').onclick = doSummary;
+
+// ═══════════════════════════════════ DEFAULT DATES (14 days from now, 3-night stay)
+const d0 = new Date(Date.now() + 14 * 864e5);
+const iso = d => d.toISOString().slice(0, 10);
+$('dep').value = iso(d0);
+$('dep').min = iso(new Date());
+$('cout').value = iso(new Date(d0.getTime() + 3 * 864e5));
+
+// ═══════════════════════════════════ INIT
+loadProv();
+api('/api/health').then(j => {
+  const v = $('ver');
+  if (j.version) {
+    v.textContent = `v${j.version} · connected`;
+    v.classList.add('connected');
+  } else {
+    v.textContent = 'backend NOT reachable';
+  }
+});
+</script>
+</body>
+</html>

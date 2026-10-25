@@ -1,0 +1,87 @@
+iso2,name,continent,tier,currency,aliases
+IN,India,Asia,1,INR,bharat|republic of india
+SG,Singapore,Asia,4,SGD,
+MY,Malaysia,Asia,2,MYR,
+TH,Thailand,Asia,2,THB,siam
+ID,Indonesia,Asia,2,IDR,
+VN,Vietnam,Asia,1,VND,viet nam
+KH,Cambodia,Asia,1,KHR,
+LA,Laos,Asia,1,LAK,lao pdr
+MM,Myanmar,Asia,1,MMK,burma
+PH,Philippines,Asia,2,PHP,
+LK,Sri Lanka,Asia,1,LKR,ceylon
+NP,Nepal,Asia,1,NPR,
+BD,Bangladesh,Asia,1,BDT,
+BT,Bhutan,Asia,1,BTN,
+PK,Pakistan,Asia,1,PKR,
+MV,Maldives,Asia,4,MVR,
+CN,China,Asia,2,CNY,prc
+HK,Hong Kong,Asia,4,HKD,hongkong
+MO,Macau,Asia,3,MOP,macao
+TW,Taiwan,Asia,3,TWD,
+JP,Japan,Asia,4,JPY,nippon
+KR,South Korea,Asia,3,KRW,korea|republic of korea
+AE,United Arab Emirates,Asia,4,AED,uae|emirates
+QA,Qatar,Asia,4,QAR,
+SA,Saudi Arabia,Asia,3,SAR,ksa
+OM,Oman,Asia,3,OMR,
+BH,Bahrain,Asia,3,BHD,
+KW,Kuwait,Asia,4,KWD,
+JO,Jordan,Asia,2,JOD,
+IL,Israel,Asia,5,ILS,
+TR,Turkey,Asia,2,TRY,turkiye
+CY,Cyprus,Europe,3,EUR,
+GB,United Kingdom,Europe,4,GBP,uk|england|britain|great britain|scotland
+IE,Ireland,Europe,4,EUR,
+FR,France,Europe,4,EUR,
+DE,Germany,Europe,4,EUR,deutschland
+NL,Netherlands,Europe,4,EUR,holland
+BE,Belgium,Europe,4,EUR,
+CH,Switzerland,Europe,5,CHF,
+AT,Austria,Europe,4,EUR,
+IT,Italy,Europe,3,EUR,
+ES,Spain,Europe,3,EUR,
+PT,Portugal,Europe,3,EUR,
+GR,Greece,Europe,3,EUR,
+DK,Denmark,Europe,5,DKK,
+SE,Sweden,Europe,4,SEK,
+NO,Norway,Europe,5,NOK,
+FI,Finland,Europe,4,EUR,
+IS,Iceland,Europe,5,ISK,
+PL,Poland,Europe,2,PLN,
+CZ,Czechia,Europe,2,CZK,czech republic
+HU,Hungary,Europe,2,HUF,
+RO,Romania,Europe,2,RON,
+HR,Croatia,Europe,3,EUR,
+RU,Russia,Europe,2,RUB,
+MT,Malta,Europe,3,EUR,
+EG,Egypt,Africa,1,EGP,
+MA,Morocco,Africa,2,MAD,
+TN,Tunisia,Africa,1,TND,
+ZA,South Africa,Africa,2,ZAR,
+KE,Kenya,Africa,2,KES,
+TZ,Tanzania,Africa,2,TZS,
+UG,Uganda,Africa,1,UGX,
+ET,Ethiopia,Africa,1,ETB,
+RW,Rwanda,Africa,2,RWF,
+GH,Ghana,Africa,1,GHS,
+NG,Nigeria,Africa,1,NGN,
+MU,Mauritius,Africa,3,MUR,
+SC,Seychelles,Africa,4,SCR,
+ZW,Zimbabwe,Africa,1,USD,
+US,United States,North America,4,USD,usa|america|united states of america
+CA,Canada,North America,4,CAD,
+MX,Mexico,North America,2,MXN,
+CR,Costa Rica,North America,3,CRC,
+PA,Panama,North America,2,USD,
+CU,Cuba,North America,2,CUP,
+DO,Dominican Republic,North America,2,DOP,
+BR,Brazil,South America,2,BRL,
+AR,Argentina,South America,2,ARS,
+CL,Chile,South America,3,CLP,
+PE,Peru,South America,2,PEN,
+CO,Colombia,South America,2,COP,
+VE,Venezuela,South America,1,VES,
+AU,Australia,Oceania,4,AUD,
+NZ,New Zealand,Oceania,4,NZD,
+FJ,Fiji,Oceania,3,FJD,

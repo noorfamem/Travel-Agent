@@ -1,0 +1,12 @@
+{
+  "_note": "Approximate reference ground-cost model in INR per person per day. NOT live prices. Used only to ESTIMATE food, local transport, activities and miscellaneous spend. Review and tune before commercial use.",
+  "reviewed": "2026-10",
+  "tiers": {
+    "1": {"label": "Low-cost destinations",  "budget": {"food": 450,  "local": 250,  "activities": 300,  "misc": 150,  "taxi_per_km": 14}, "standard": {"food": 900,  "local": 450,  "activities": 600,  "misc": 300,  "taxi_per_km": 18}, "luxury": {"food": 2500, "local": 1500, "activities": 1500, "misc": 800,  "taxi_per_km": 28}},
+    "2": {"label": "Moderate-cost destinations", "budget": {"food": 700,  "local": 300,  "activities": 400,  "misc": 200,  "taxi_per_km": 20}, "standard": {"food": 1400, "local": 600,  "activities": 900,  "misc": 400,  "taxi_per_km": 26}, "luxury": {"food": 3500, "local": 1800, "activities": 2200, "misc": 1000, "taxi_per_km": 38}},
+    "3": {"label": "Higher-cost destinations", "budget": {"food": 1200, "local": 500,  "activities": 700,  "misc": 350,  "taxi_per_km": 45}, "standard": {"food": 2400, "local": 900,  "activities": 1500, "misc": 700,  "taxi_per_km": 60}, "luxury": {"food": 6000, "local": 2800, "activities": 3500, "misc": 2000, "taxi_per_km": 90}},
+    "4": {"label": "High-cost destinations", "budget": {"food": 1800, "local": 700,  "activities": 1000, "misc": 500,  "taxi_per_km": 70}, "standard": {"food": 3500, "local": 1300, "activities": 2200, "misc": 1000, "taxi_per_km": 95}, "luxury": {"food": 9000, "local": 3500, "activities": 5000, "misc": 3000, "taxi_per_km": 140}},
+    "5": {"label": "Very-high-cost destinations", "budget": {"food": 2800, "local": 1200, "activities": 1500, "misc": 800,  "taxi_per_km": 130}, "standard": {"food": 5500, "local": 1900, "activities": 3000, "misc": 1500, "taxi_per_km": 170}, "luxury": {"food": 14000, "local": 5000, "activities": 8000, "misc": 5000, "taxi_per_km": 250}}
+  },
+  "india_metro_multiplier": 1.3
+}

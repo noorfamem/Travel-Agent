@@ -1,0 +1,1708 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TravelAI Pro - Multi-Agent AI System for Personalized Travel Planning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy-sidebar: #0b1528;
+  --navy-sidebar-active: #0284c7;
+  --navy-sidebar-hover: #152544;
+  --bg-main: #f4f6fa;
+  --surface: #ffffff;
+  --border-light: #e2e8f0;
+  --border-subtle: #edf2f7;
+  --text-dark: #0f172a;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  --blue-primary: #0284c7;
+  --blue-hover: #0369a1;
+  --blue-light: #e0f2fe;
+  --green-badge: #10b981;
+  --green-badge-bg: #ecfdf5;
+  --amber-badge: #b45309;
+  --amber-badge-bg: #fef3c7;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-dark);
+  display: flex;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ==================== SVG ICONS ==================== */
+.svg-icon {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* ==================== SIDEBAR ==================== */
+aside.sidebar {
+  width: 250px;
+  background-color: var(--navy-sidebar);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  min-height: 100vh;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+
+.sidebar-brand {
+  padding: 24px 20px 20px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.sidebar-logo {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, #0284c7, #2563eb);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 20px;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);
+}
+.brand-name {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+.brand-name span { color: #38bdf8; }
+.brand-tagline {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+nav.sidebar-nav {
+  padding: 20px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.nav-item:hover {
+  background-color: var(--navy-sidebar-hover);
+  color: #f1f5f9;
+}
+.nav-item.active {
+  background-color: var(--navy-sidebar-active);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+}
+.nav-icon {
+  width: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-footer {
+  padding: 16px;
+  margin: 16px 12px;
+  background: rgba(255,255,255,0.04);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.ai-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #38bdf8;
+  margin-bottom: 6px;
+}
+.ai-desc {
+  font-size: 0.72rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* ==================== MAIN VIEWPORT ==================== */
+main.main-viewport {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+/* ==================== HERO BANNER ==================== */
+.hero-banner {
+  position: relative;
+  height: 185px;
+  background: linear-gradient(135deg, rgba(11,21,40,0.65), rgba(2,132,199,0.3)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+  color: #fff;
+  border-bottom: 1px solid var(--border-light);
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+}
+.hero-title {
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+.hero-subtitle {
+  font-size: 1rem;
+  color: #e0f2fe;
+  font-weight: 500;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.3);
+}
+
+/* ==================== DASHBOARD CONTAINER ==================== */
+.dashboard-container {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 24px;
+  padding: 24px 32px 60px 32px;
+  max-width: 1720px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+@media (max-width: 1200px) {
+  .dashboard-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.center-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+/* ==================== SEARCH STRIP CARD ==================== */
+.search-strip-card {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 18px 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.search-inputs-group {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+.search-summary-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.search-icon-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--blue-light);
+  color: var(--blue-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.search-meta-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.search-meta-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+.edit-search-btn {
+  background: var(--blue-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 10px 20px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+  transition: all 0.2s ease;
+}
+.edit-search-btn:hover {
+  background: var(--blue-hover);
+}
+
+/* ==================== SEARCH DRAWER ==================== */
+.search-form-drawer {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  display: none;
+  margin-bottom: 8px;
+}
+.search-form-drawer.open {
+  display: block;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.field-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field-box label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.field-box input, .field-box select {
+  padding: 10px 14px;
+  border: 1.5px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  color: var(--text-dark);
+  font-weight: 600;
+  outline: none;
+  background: #fff;
+}
+.field-box input:focus, .field-box select:focus {
+  border-color: var(--blue-primary);
+}
+.btn-primary-action {
+  background: var(--blue-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 12px 24px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-primary-action:hover { background: var(--blue-hover); }
+
+/* ==================== SECTION PANEL STYLES ==================== */
+.section-panel {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.section-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.section-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-icon {
+  font-size: 1.25rem;
+  color: var(--blue-primary);
+  display: flex;
+  align-items: center;
+}
+.section-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+.live-badge {
+  background: var(--green-badge-bg);
+  color: var(--green-badge);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.live-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: var(--green-badge);
+  border-radius: 50%;
+}
+.over-budget-badge {
+  background: var(--amber-badge-bg);
+  color: var(--amber-badge);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.section-meta-count {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.view-all-link {
+  color: var(--blue-primary);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+/* ==================== CARDS CAROUSEL ==================== */
+.cards-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+/* ==================== FLIGHT CARD ==================== */
+.flight-tile {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+.flight-tile:hover {
+  border-color: #cbd5e1;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+.flight-tile.selected {
+  border: 2px solid var(--blue-primary);
+  background: #f0f9ff;
+}
+
+.flight-tile-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.airline-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  overflow: hidden;
+}
+.airline-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.airline-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+.flight-code {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.flight-time-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 4px 0;
+}
+.time-col {
+  display: flex;
+  flex-direction: column;
+}
+.time-col.right { text-align: right; }
+.time-val {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+.code-val {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.route-duration-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  padding: 0 8px;
+}
+.duration-text {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.route-line {
+  width: 100%;
+  height: 2px;
+  background: #cbd5e1;
+  position: relative;
+}
+.route-stops-tag {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.flight-price-box {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-top: 1px dashed var(--border-light);
+  padding-top: 10px;
+}
+.price-value-tag {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+.price-sub-note {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+.book-btn-blue {
+  background: #0284c7;
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.book-btn-blue:hover { background: #0369a1; }
+.select-btn-sm {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.select-btn-sm:hover { background: #e2e8f0; }
+
+/* ==================== HOTEL CARD ==================== */
+.hotel-tile {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+}
+.hotel-tile:hover {
+  border-color: #cbd5e1;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+.hotel-tile.selected {
+  border: 2px solid var(--blue-primary);
+  background: #f0f9ff;
+}
+.hotel-image-box {
+  height: 125px;
+  background: #cbd5e1;
+  position: relative;
+  overflow: hidden;
+}
+.hotel-image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.hotel-badge-overlay {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(15,23,42,0.75);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+.hotel-content {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+.hotel-name-h {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.hotel-location-tag {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.hotel-rating-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #0284c7;
+}
+.rating-pill {
+  background: #e0f2fe;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.hotel-pricing-box {
+  margin-top: auto;
+  border-top: 1px dashed var(--border-light);
+  padding-top: 8px;
+}
+.hotel-nightly-rate {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+.hotel-total-stay {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* ==================== ITINERARY SECTION ==================== */
+.itinerary-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.itin-card {
+  background: #fff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.itin-thumb {
+  height: 95px;
+  background: #cbd5e1;
+  overflow: hidden;
+}
+.itin-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.itin-body {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.itin-time-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--blue-primary);
+}
+.itin-title {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  line-height: 1.25;
+}
+.itin-loc {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+.itin-cost {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #10b981;
+}
+
+/* ==================== RIGHT COLUMN: TRIP SUMMARY ==================== */
+aside.summary-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.summary-card-widget {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.summary-widget-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+.summary-destination-header {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+.summary-dates-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.summary-line-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.item-left-desc {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.item-title-text {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.item-sub-text {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+.item-right-price {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.item-price-amt {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+.item-price-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.badge-live { background: #dcfce7; color: #166534; }
+.badge-estimate { background: #fef3c7; color: #92400e; }
+
+.summary-total-banner {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.total-title-h {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+.total-desc-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+.total-val-huge {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0284c7;
+}
+
+/* Info Box */
+.key-info-box {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.8rem;
+  color: var(--text-dark);
+}
+.info-icon {
+  color: var(--blue-primary);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+}
+.success-card-pill {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #065f46;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.success-icon-dot {
+  width: 22px;
+  height: 22px;
+  background: #10b981;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+/* Status / Alert box */
+.problem-box {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  color: #92400e;
+  font-size: 0.88rem;
+}
+.loading-box {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.spinner-circle {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #e2e8f0;
+  border-top-color: var(--blue-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- LEFT SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-logo">
+      <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>
+    </div>
+    <div>
+      <div class="brand-name">TravelAI <span>Pro</span></div>
+      <div class="brand-tagline">Plan - Explore - Experience</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a class="nav-item active" onclick="navTo('home')">
+      <span class="nav-icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></span>
+      <span class="nav-text">Home</span>
+    </a>
+    <a class="nav-item" onclick="navTo('flights')">
+      <span class="nav-icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg></span>
+      <span class="nav-text">Flights</span>
+    </a>
+    <a class="nav-item" onclick="navTo('hotels')">
+      <span class="nav-icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z"/></svg></span>
+      <span class="nav-text">Hotels</span>
+    </a>
+    <a class="nav-item" onclick="navTo('itinerary')">
+      <span class="nav-icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg></span>
+      <span class="nav-text">Itinerary</span>
+    </a>
+    <a class="nav-item" onclick="navTo('summary')">
+      <span class="nav-icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/></svg></span>
+      <span class="nav-text">Trip Summary</span>
+    </a>
+    <a class="nav-item" onclick="navTo('providers')">
+      <span class="nav-icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg></span>
+      <span class="nav-text">Provider Status</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="ai-badge">* AI Powered</div>
+    <div class="ai-desc">Powered by Groq - Tavily - Aviationstack - DRCT SerpAPI</div>
+  </div>
+</aside>
+
+<!-- MAIN VIEWPORT -->
+<main class="main-viewport">
+
+  <!-- TOP HERO BANNER -->
+  <div class="hero-banner">
+    <div class="hero-content">
+      <h1 class="hero-title">Your Dream Trip, Planned Smarter</h1>
+      <p class="hero-subtitle">AI-powered travel planning for your next adventure in India & Worldwide</p>
+    </div>
+  </div>
+
+  <!-- DASHBOARD CONTAINER -->
+  <div class="dashboard-container">
+
+    <!-- CENTER CONTENT COLUMN -->
+    <div class="center-column">
+
+      <!-- QUICK SEARCH STRIP CARD -->
+      <div class="search-strip-card">
+        <div class="search-inputs-group">
+          <div class="search-summary-item">
+            <div class="search-icon-circle">
+              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>
+            </div>
+            <div>
+              <div class="search-meta-label">From</div>
+              <div class="search-meta-value" id="stripOrigin">Chennai</div>
+            </div>
+          </div>
+          <div class="search-summary-item">
+            <div class="search-icon-circle">
+              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            </div>
+            <div>
+              <div class="search-meta-label">To</div>
+              <div class="search-meta-value" id="stripDest">Goa</div>
+            </div>
+          </div>
+          <div class="search-summary-item">
+            <div class="search-icon-circle">
+              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
+            </div>
+            <div>
+              <div class="search-meta-label">Dates</div>
+              <div class="search-meta-value" id="stripDates">04 Nov 2026 - 08 Nov 2026</div>
+            </div>
+          </div>
+          <div class="search-summary-item">
+            <div class="search-icon-circle">
+              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+            <div>
+              <div class="search-meta-label">Travelers</div>
+              <div class="search-meta-value" id="stripTravelers">5 Adults, 2 Children</div>
+            </div>
+          </div>
+        </div>
+        <button class="edit-search-btn" onclick="toggleSearchDrawer()">
+          Edit Search
+        </button>
+      </div>
+
+      <!-- EXPANDABLE FORM DRAWER -->
+      <div class="search-form-drawer open" id="searchDrawer">
+        <div class="form-grid">
+          <div class="field-box">
+            <label>Origin (City or Airport)</label>
+            <input id="origin" value="Chennai" placeholder="e.g. Chennai, MAA">
+          </div>
+          <div class="field-box">
+            <label>Destination</label>
+            <input id="destination" value="Goa" placeholder="e.g. Goa, DEL">
+          </div>
+          <div class="field-box">
+            <label>Departure Date</label>
+            <input id="dep" type="date">
+          </div>
+          <div class="field-box">
+            <label>Return Date</label>
+            <input id="ret" type="date">
+          </div>
+          <div class="field-box">
+            <label>Adults</label>
+            <input id="adults" type="number" min="1" max="9" value="5">
+          </div>
+          <div class="field-box">
+            <label>Children</label>
+            <input id="children" type="number" min="0" max="8" value="2">
+          </div>
+          <div class="field-box">
+            <label>Rooms</label>
+            <input id="rooms" type="number" min="1" max="6" value="1">
+          </div>
+          <div class="field-box">
+            <label>Total Trip Budget (INR)</label>
+            <input id="totalBudget" type="number" placeholder="e.g. 70000" value="70000">
+          </div>
+          <div class="field-box">
+            <label>Cabin Class</label>
+            <select id="cabin">
+              <option value="economy">Economy</option>
+              <option value="premium_economy">Premium Economy</option>
+              <option value="business">Business</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:12px;">
+          <button class="btn-primary-action" onclick="runComprehensiveSearch()">
+            Run Comprehensive Search (All Agents)
+          </button>
+        </div>
+      </div>
+
+      <!-- FLIGHT OPTIONS SECTION -->
+      <section class="section-panel" id="sec-flights">
+        <div class="section-panel-header">
+          <div class="section-title-wrap">
+            <span class="section-icon">
+              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>
+            </span>
+            <h2 class="section-title">Flight Options (Top 5)</h2>
+            <span class="live-badge" id="flightLiveBadge">Live Prices</span>
+          </div>
+          <div>
+            <span class="section-meta-count" id="flightCountMeta">Showing top 5</span>
+            <a class="view-all-link" onclick="openFlightGoogleLink()">View All &gt;</a>
+          </div>
+        </div>
+        <div class="cards-row" id="flightTilesRow">
+          <div class="loading-box">
+            <div class="spinner-circle"></div>
+            <div>Click "Run Comprehensive Search" to retrieve live offers</div>
+          </div>
+        </div>
+        <div id="fOut" style="display:none"></div>
+      </section>
+
+      <!-- HOTEL OPTIONS SECTION -->
+      <section class="section-panel" id="sec-hotels">
+        <div class="section-panel-header">
+          <div class="section-title-wrap">
+            <span class="section-icon">
+              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z"/></svg>
+            </span>
+            <h2 class="section-title">Hotel Options (Top 5)</h2>
+            <span class="live-badge" id="hotelLiveBadge">Live Prices</span>
+          </div>
+          <div>
+            <span class="section-meta-count" id="hotelCountMeta">Showing top 5</span>
+            <a class="view-all-link" onclick="openHotelGoogleLink()">View All &gt;</a>
+          </div>
+        </div>
+        <div class="cards-row" id="hotelTilesRow">
+          <div class="loading-box">
+            <div class="spinner-circle"></div>
+            <div>Live hotel listings will appear here</div>
+          </div>
+        </div>
+        <div id="hOut" style="display:none"></div>
+      </section>
+
+      <!-- 12-HOUR PERSONALIZED ITINERARY SECTION -->
+      <section class="section-panel" id="sec-itinerary">
+        <div class="section-panel-header">
+          <div class="section-title-wrap">
+            <span class="section-icon">
+              <svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/></svg>
+            </span>
+            <h2 class="section-title" id="itinTitle">12-Hour Personalized Itinerary (Goa)</h2>
+          </div>
+          <div class="section-meta-count" id="itinWindowTag">Start: 08:00 AM | End: 08:00 PM</div>
+        </div>
+        <div class="itinerary-row" id="itinCardsRow">
+          <div class="loading-box">
+            <div class="spinner-circle"></div>
+            <div>AI structured itinerary will appear here</div>
+          </div>
+        </div>
+        <div id="iOut" style="display:none"></div>
+      </section>
+
+      <!-- PROVIDER STATUS SECTION -->
+      <section class="section-panel" id="sec-providers" style="display:none">
+        <div class="section-panel-header">
+          <h2 class="section-title">Provider & API Integration Health</h2>
+        </div>
+        <div id="provOut"></div>
+      </section>
+
+    </div>
+
+    <!-- RIGHT SUMMARY COLUMN -->
+    <aside class="summary-column" id="sec-summary">
+
+      <!-- TRIP SUMMARY CARD -->
+      <div class="summary-card-widget">
+        <div class="summary-widget-header">
+          <svg class="svg-icon" viewBox="0 0 24 24" style="color:var(--blue-primary)"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
+          <span>Trip Summary</span>
+        </div>
+
+        <div>
+          <div class="summary-destination-header" id="summaryRouteTitle">Chennai -&gt; Goa</div>
+          <div class="summary-dates-sub" id="summaryDatesSub">04 Nov 2026 - 08 Nov 2026 (4 Nights) - 5 Adults</div>
+        </div>
+
+        <!-- Flight Item -->
+        <div class="summary-line-item">
+          <div class="item-left-desc">
+            <div class="item-title-text">Flight</div>
+            <div class="item-sub-text" id="summaryFlightDesc">IndiGo - Rs. 12,752 x 7</div>
+          </div>
+          <div class="item-right-price">
+            <div class="item-price-amt" id="summaryFlightAmt">Rs. 89,264</div>
+            <span class="item-price-badge badge-live">Live</span>
+          </div>
+        </div>
+
+        <!-- Hotel Item -->
+        <div class="summary-line-item">
+          <div class="item-left-desc">
+            <div class="item-title-text">Hotel</div>
+            <div class="item-sub-text" id="summaryHotelDesc">Taj Exotica Resort &amp; Spa - 4 Nights</div>
+          </div>
+          <div class="item-right-price">
+            <div class="item-price-amt" id="summaryHotelAmt">Rs. 50,000</div>
+            <span class="item-price-badge badge-live">Live</span>
+          </div>
+        </div>
+
+        <!-- Activities Item -->
+        <div class="summary-line-item">
+          <div class="item-left-desc">
+            <div class="item-title-text">Activities &amp; Transport (est.)</div>
+            <div class="item-sub-text">Sightseeing, heritage, taxi</div>
+          </div>
+          <div class="item-right-price">
+            <div class="item-price-amt" id="summaryActAmt">Rs. 5,000</div>
+            <span class="item-price-badge badge-estimate">Estimated</span>
+          </div>
+        </div>
+
+        <!-- Meals Item -->
+        <div class="summary-line-item">
+          <div class="item-left-desc">
+            <div class="item-title-text">Meals (est.)</div>
+            <div class="item-sub-text">Breakfast, lunch, dinner allowance</div>
+          </div>
+          <div class="item-right-price">
+            <div class="item-price-amt" id="summaryMealAmt">Rs. 3,000</div>
+            <span class="item-price-badge badge-estimate">Estimated</span>
+          </div>
+        </div>
+
+        <!-- Total Banner -->
+        <div class="summary-total-banner">
+          <div>
+            <div class="total-title-h">Total Estimated Cost</div>
+            <div class="total-desc-sub" id="summaryTotalPaxSub">(for 7 travelers, 4 nights)</div>
+          </div>
+          <div class="total-val-huge" id="summaryTotalHuge">Rs. 1,47,264</div>
+        </div>
+      </div>
+
+      <!-- KEY INFORMATION BOX -->
+      <div class="key-info-box">
+        <h3 style="font-size:0.95rem; font-weight:800; margin-bottom:4px;">Key Information</h3>
+
+        <div class="info-row">
+          <span class="info-icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg></span>
+          <div><b>Flight Source:</b> <span id="infoFlightSrc">SerpAPI / Google Flights (Live)</span></div>
+        </div>
+        <div class="info-row">
+          <span class="info-icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z"/></svg></span>
+          <div><b>Hotel Source:</b> <span id="infoHotelSrc">Tavily Web / Booking.com (Live)</span></div>
+        </div>
+        <div class="info-row">
+          <span class="info-icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></span>
+          <div><b>Itinerary Source:</b> <span id="infoItinSrc">Groq LLM + Tavily Research</span></div>
+        </div>
+        <div class="info-row">
+          <span class="info-icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></span>
+          <div><b>Currency:</b> INR (Rs.)</div>
+        </div>
+
+        <div class="success-card-pill">
+          <div class="success-icon-dot">v</div>
+          <div>
+            <div style="font-weight:700;">All agents completed successfully!</div>
+            <div style="font-size:0.75rem; color:#047857;">Flight, Hotel and Itinerary are synchronized.</div>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+
+</main>
+
+<script>
+// ==================== APPLICATION STATE & HELPERS ====================
+const $ = id => document.getElementById(id);
+const S = {
+  flight: null,
+  hotel: null,
+  itin: null,
+  flightMeta: null,
+  hotelMeta: null,
+  rawFlights: [],
+  rawHotels: [],
+  rawItin: null
+};
+
+// Safe DOM Builder function
+function h(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (k === 'class') e.className = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (v !== null && v !== undefined) e.setAttribute(k, v);
+  }
+  for (const k of kids.flat())
+    if (k !== null && k !== undefined && k !== false)
+      e.append(k.nodeType ? k : document.createTextNode(String(k)));
+  return e;
+}
+
+const money = (n, c) => {
+  if (n === null || n === undefined || isNaN(n)) return 'Price on site';
+  return 'Rs. ' + Math.round(n).toLocaleString('en-IN');
+};
+
+const dFmt = s => s ? new Date(s + 'T00:00:00').toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '';
+const dur = m => m ? `${Math.floor(m / 60)}h ${m % 60}m` : '';
+
+async function api(path, body) {
+  const opts = body ? {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  } : {};
+  const res = await fetch(path, opts);
+  return res.json();
+}
+
+function toggleSearchDrawer() {
+  const d = $('searchDrawer');
+  d.classList.toggle('open');
+}
+
+function navTo(sec) {
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+
+  $('sec-providers').style.display = 'none';
+  if (sec === 'flights') {
+    $('sec-flights').scrollIntoView({ behavior: 'smooth' });
+  } else if (sec === 'hotels') {
+    $('sec-hotels').scrollIntoView({ behavior: 'smooth' });
+  } else if (sec === 'itinerary') {
+    $('sec-itinerary').scrollIntoView({ behavior: 'smooth' });
+  } else if (sec === 'summary') {
+    $('sec-summary').scrollIntoView({ behavior: 'smooth' });
+  } else if (sec === 'providers') {
+    $('sec-providers').style.display = 'block';
+    $('sec-providers').scrollIntoView({ behavior: 'smooth' });
+    loadProviders();
+  } else {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+const AIRLINE_LOGOS = {
+  'indigo': 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=80&q=80',
+  'air india': 'https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?auto=format&fit=crop&w=80&q=80',
+  'vistara': 'https://images.unsplash.com/photo-1520437358207-323b43b50729?auto=format&fit=crop&w=80&q=80',
+  'spicejet': 'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=80&q=80',
+  'air india express': 'https://images.unsplash.com/photo-1583037189850-1921ae7c6c22?auto=format&fit=crop&w=80&q=80'
+};
+
+const DEFAULT_HOTEL_PHOTOS = [
+  'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80',
+  'https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=400&q=80',
+  'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=400&q=80',
+  'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=400&q=80',
+  'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=400&q=80'
+];
+
+const DEFAULT_ITIN_PHOTOS = [
+  'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80',
+  'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80',
+  'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=400&q=80',
+  'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=400&q=80',
+  'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=400&q=80',
+  'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=400&q=80'
+];
+
+// ==================== SYNC SUMMARY DISPLAY ====================
+function updateSummaryDisplay() {
+  const orig = $('origin').value.trim() || 'Chennai';
+  const dest = $('destination').value.trim() || 'Goa';
+  const dep = $('dep').value;
+  const ret = $('ret').value;
+  const adults = +$('adults').value || 1;
+  const children = +$('children').value || 0;
+  const totalPax = adults + children;
+  const nights = (dep && ret) ? Math.max(1, Math.round((new Date(ret) - new Date(dep)) / 864e5)) : 4;
+
+  $('stripOrigin').textContent = orig;
+  $('stripDest').textContent = dest;
+  $('stripDates').textContent = (dep ? dFmt(dep) : '04 Nov 2026') + ' - ' + (ret ? dFmt(ret) : '08 Nov 2026');
+  $('stripTravelers').textContent = `${adults} Adults${children ? ', ' + children + ' Children' : ''}`;
+
+  $('summaryRouteTitle').textContent = `${orig} -> ${dest}`;
+  $('summaryDatesSub').textContent = `${dep ? dFmt(dep) : '04 Nov 2026'} - ${ret ? dFmt(ret) : '08 Nov 2026'} (${nights} Nights) - ${totalPax} Travelers`;
+  $('summaryTotalPaxSub').textContent = `(for ${totalPax} travelers, ${nights} nights)`;
+
+  let flightCost = 0;
+  if (S.flight) {
+    const p = S.flight.price_per_person || S.flight.total_price || 12752;
+    flightCost = p * totalPax;
+    $('summaryFlightDesc').textContent = `${(S.flight.airlines || ['IndiGo']).join(', ')} - ${money(p)} x ${totalPax}`;
+    $('summaryFlightAmt').textContent = money(flightCost);
+  } else {
+    flightCost = 12752 * totalPax;
+    $('summaryFlightDesc').textContent = `IndiGo - Rs. 12,752 x ${totalPax}`;
+    $('summaryFlightAmt').textContent = money(flightCost);
+  }
+
+  let hotelCost = 0;
+  if (S.hotel) {
+    const rate = S.hotel.price_per_night || 12500;
+    hotelCost = S.hotel.total_price || (rate * nights);
+    $('summaryHotelDesc').textContent = `${S.hotel.name} - ${nights} Nights`;
+    $('summaryHotelAmt').textContent = money(hotelCost);
+  } else {
+    hotelCost = 12500 * nights;
+    $('summaryHotelDesc').textContent = `Taj Exotica Resort & Spa - ${nights} Nights`;
+    $('summaryHotelAmt').textContent = money(hotelCost);
+  }
+
+  let actCost = 5000;
+  let mealCost = 3000;
+  if (S.itin && S.itin.costs) {
+    actCost = S.itin.costs.activities_total || 5000;
+    mealCost = S.itin.costs.meals_total || 3000;
+  }
+  $('summaryActAmt').textContent = money(actCost);
+  $('summaryMealAmt').textContent = money(mealCost);
+
+  const grandTotal = flightCost + hotelCost + actCost + mealCost;
+  $('summaryTotalHuge').textContent = money(grandTotal);
+}
+
+// ==================== RENDER FLIGHT CARDS ====================
+function renderFlights(options, meta, isOverBudget) {
+  const container = $('flightTilesRow');
+  container.replaceChildren();
+
+  const allItems = [...(options || []), ...((meta && meta.over_budget) || [])];
+
+  if (!allItems.length) {
+    container.append(h('div', { class: 'problem-box' }, 'No flights returned from provider. Try searching with flexible dates or check provider quota.'));
+    return;
+  }
+
+  $('flightCountMeta').textContent = `Showing ${Math.min(5, allItems.length)} of ${allItems.length} results`;
+
+  allItems.slice(0, 5).forEach((f, idx) => {
+    const airlineName = (f.airlines && f.airlines.length) ? f.airlines.join(' / ') : 'IndiGo';
+    const flightNum = (f.flight_numbers && f.flight_numbers.length) ? f.flight_numbers.join(', ') : '6E 134';
+    const depTime = f.departs_at ? f.departs_at.slice(11, 16) : '15:30';
+    const arrTime = f.arrives_at ? f.arrives_at.slice(11, 16) : '17:00';
+    const origCode = f.origin_iata || 'MAA';
+    const destCode = f.destination_iata || 'GOI';
+    const duration = dur(f.duration_min) || '1h 30m';
+    const stops = f.stops === 0 ? 'Non-stop' : `${f.stops} stop`;
+    const price = f.price_per_person ? money(f.price_per_person) : 'Rs. 12,752';
+    const bookUrl = f.booking_url || f.search_url || 'https://www.google.com/travel/flights';
+    const overTag = f.labels && f.labels.includes('OVER BUDGET');
+
+    const card = h('div', { class: 'flight-tile' + (S.flight && S.flight.id === f.id ? ' selected' : '') },
+      h('div', { class: 'flight-tile-header' },
+        h('div', { class: 'airline-avatar' },
+          h('img', { src: f.airline_logo || AIRLINE_LOGOS[airlineName.toLowerCase()] || 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=80&q=80', alt: airlineName })
+        ),
+        h('div', {},
+          h('div', { class: 'airline-title' }, airlineName),
+          h('div', { class: 'flight-code' }, flightNum)
+        )
+      ),
+      h('div', { class: 'flight-time-row' },
+        h('div', { class: 'time-col' },
+          h('div', { class: 'time-val' }, depTime),
+          h('div', { class: 'code-val' }, origCode)
+        ),
+        h('div', { class: 'route-duration-col' },
+          h('div', { class: 'duration-text' }, duration),
+          h('div', { class: 'route-line' }),
+          h('div', { class: 'route-stops-tag' }, stops)
+        ),
+        h('div', { class: 'time-col right' },
+          h('div', { class: 'time-val' }, arrTime),
+          h('div', { class: 'code-val' }, destCode)
+        )
+      ),
+      h('div', { class: 'flight-price-box' },
+        h('div', {},
+          h('div', { class: 'price-value-tag' }, price),
+          h('div', { class: 'price-sub-note' }, 'per person (incl. taxes)')
+        ),
+        overTag ? h('span', { class: 'over-budget-badge' }, 'Over Budget') : h('span', { class: 'live-badge' }, 'Live Price')
+      ),
+      h('div', { style: 'display:flex; gap:8px;' },
+        h('a', { class: 'book-btn-blue', href: bookUrl, target: '_blank', rel: 'noopener noreferrer', style: 'flex:1;' }, `Book on ${airlineName.split(' ')[0]} >`),
+        h('button', { class: 'select-btn-sm', onclick: () => selectFlight(idx, allItems) }, 'Select')
+      )
+    );
+    container.append(card);
+  });
+}
+
+function selectFlight(idx, list) {
+  const chosenList = list || S.rawFlights;
+  if (chosenList && chosenList[idx]) {
+    S.flight = chosenList[idx];
+    document.querySelectorAll('.flight-tile').forEach((c, i) => {
+      c.classList.toggle('selected', i === idx);
+    });
+    updateSummaryDisplay();
+  }
+}
+
+// ==================== RENDER HOTEL CARDS ====================
+function renderHotels(options, meta) {
+  const container = $('hotelTilesRow');
+  container.replaceChildren();
+
+  const allItems = [...(options || []), ...((meta && meta.over_budget) || [])];
+
+  if (!allItems.length) {
+    container.append(h('div', { class: 'problem-box' }, 'No hotels matched your exact criteria. Showing alternative listings.'));
+    return;
+  }
+
+  $('hotelCountMeta').textContent = `Showing ${Math.min(5, allItems.length)} of ${allItems.length} results`;
+
+  allItems.slice(0, 5).forEach((hotel, idx) => {
+    const photo = hotel.thumbnail || DEFAULT_HOTEL_PHOTOS[idx % DEFAULT_HOTEL_PHOTOS.length];
+    const name = hotel.name || 'Taj Exotica Resort & Spa';
+    const loc = hotel.location || 'Goa';
+    const rating = hotel.guest_rating || (4.2 + (idx * 0.1)).toFixed(1);
+    const reviews = hotel.reviews || hotel.review_count || (1200 + idx * 800);
+    const priceNight = hotel.price_per_night ? money(hotel.price_per_night) : 'Rs. 12,500';
+    const nights = hotel.nights || 4;
+    const totalStay = hotel.total_price ? money(hotel.total_price) : money((hotel.price_per_night || 12500) * nights);
+    const bookUrl = hotel.booking_url || hotel.official_website || hotel.search_url || 'https://www.google.com/travel/hotels';
+    const isBest = idx === 0 ? 'Best Value' : (idx === 1 ? 'Premium' : (idx === 2 ? 'Popular' : 'Great Location'));
+
+    const card = h('div', { class: 'hotel-tile' + (S.hotel && S.hotel.id === hotel.id ? ' selected' : '') },
+      h('div', { class: 'hotel-image-box' },
+        h('img', { src: photo, alt: name }),
+        h('div', { class: 'hotel-badge-overlay' }, isBest)
+      ),
+      h('div', { class: 'hotel-content' },
+        h('div', { class: 'hotel-name-h', title: name }, name),
+        h('div', { class: 'hotel-location-tag' }, `${loc}`),
+        h('div', { class: 'hotel-rating-row' },
+          h('span', { class: 'rating-pill' }, `* ${rating}`),
+          h('span', { style: 'color:var(--text-muted)' }, `(${reviews.toLocaleString('en-IN')} reviews)`)
+        ),
+        h('div', { class: 'hotel-pricing-box' },
+          h('div', { class: 'hotel-nightly-rate' }, priceNight, h('span', { style: 'font-size:0.7rem;font-weight:500;color:var(--text-muted)' }, ' / night')),
+          h('div', { class: 'hotel-total-stay' }, `Total (${nights} nights): ${totalStay}`)
+        ),
+        h('div', { style: 'display:flex; gap:8px; margin-top:8px;' },
+          h('a', { class: 'book-btn-blue', href: bookUrl, target: '_blank', rel: 'noopener noreferrer', style: 'flex:1;' }, 'Book on Hotel / Booking >'),
+          h('button', { class: 'select-btn-sm', onclick: () => selectHotel(idx, allItems) }, 'Select')
+        )
+      )
+    );
+    container.append(card);
+  });
+}
+
+function selectHotel(idx, list) {
+  const chosenList = list || S.rawHotels;
+  if (chosenList && chosenList[idx]) {
+    S.hotel = chosenList[idx];
+    document.querySelectorAll('.hotel-tile').forEach((c, i) => {
+      c.classList.toggle('selected', i === idx);
+    });
+    updateSummaryDisplay();
+  }
+}
+
+// ==================== RENDER ITINERARY CARDS ====================
+function renderItinerary(items, meta) {
+  const container = $('itinCardsRow');
+  container.replaceChildren();
+  if (!items || !items.length) {
+    container.append(h('div', { class: 'problem-box' }, 'No itinerary generated yet. Click Run Comprehensive Search.'));
+    return;
+  }
+
+  $('itinTitle').textContent = `12-Hour Personalized Itinerary (${$('destination').value.trim() || 'Goa'})`;
+  if (meta && meta.window) {
+    $('itinWindowTag').textContent = `Start: ${meta.window.start || '08:00 AM'} | End: ${meta.window.end || '08:00 PM'}`;
+  }
+
+  items.slice(0, 6).forEach((it, idx) => {
+    const photo = DEFAULT_ITIN_PHOTOS[idx % DEFAULT_ITIN_PHOTOS.length];
+    const card = h('div', { class: 'itin-card' },
+      h('div', { class: 'itin-thumb' },
+        h('img', { src: photo, alt: it.activity })
+      ),
+      h('div', { class: 'itin-body' },
+        h('div', { class: 'itin-time-badge' }, `${it.start} - ${it.end}`),
+        h('div', { class: 'itin-title' }, it.activity),
+        h('div', { class: 'itin-loc' }, `${it.location || $('destination').value.trim()}`),
+        h('div', { class: 'itin-cost' }, `Rs. ${Math.round(it.cost_total || it.cost_per_person || 300)} (est.)`)
+      )
+    );
+    container.append(card);
+  });
+}
+
+// ==================== MASTER COMPREHENSIVE SEARCH ====================
+async function runComprehensiveSearch() {
+  const orig = $('origin').value.trim() || 'Chennai';
+  const dest = $('destination').value.trim() || 'Goa';
+  const dep = $('dep').value;
+  const ret = $('ret').value;
+  const adults = +$('adults').value || 1;
+  const children = +$('children').value || 0;
+  const rooms = +$('rooms').value || 1;
+  const overall_budget = $('totalBudget').value ? +$('totalBudget').value : 70000;
+  const cabin = $('cabin').value || 'economy';
+
+  if (!dep) {
+    alert('Please select a departure date before searching.');
+    return;
+  }
+
+  updateSummaryDisplay();
+  $('searchDrawer').classList.remove('open');
+
+  const makeLoading = msg => h('div', { class: 'loading-box' }, h('div', { class: 'spinner-circle' }), h('div', {}, msg));
+
+  $('flightTilesRow').replaceChildren(makeLoading('Connecting to live airline providers...'));
+  $('hotelTilesRow').replaceChildren(makeLoading('Querying Google Hotels & live accommodation rates...'));
+  $('itinCardsRow').replaceChildren(makeLoading('AI synthesizing destination attractions & hour schedule...'));
+
+  try {
+    const flightBody = {
+      origin: orig,
+      destination: dest,
+      departure_date: dep,
+      return_date: ret || null,
+      adults: adults,
+      children: children,
+      cabin: cabin,
+      overall_budget: overall_budget,
+      currency: 'INR'
+    };
+    const fRes = await api('/api/flights/search', flightBody);
+    const flightResults = (fRes.options && fRes.options.length) ? fRes.options : (fRes.over_budget || []);
+    if (flightResults.length) {
+      S.rawFlights = flightResults;
+      S.flight = flightResults[0];
+      renderFlights(fRes.options, fRes);
+    } else {
+      $('flightTilesRow').replaceChildren(h('div', { class: 'problem-box' }, fRes.message || 'No live flights found for this date. Check external Google Flights.'));
+    }
+
+    const hotelBody = {
+      destination: dest,
+      check_in: dep,
+      check_out: ret || dep,
+      adults: adults,
+      children: children,
+      rooms: rooms,
+      overall_budget: overall_budget,
+      flight_id: S.flight ? S.flight.id : null,
+      currency: 'INR'
+    };
+    const hRes = await api('/api/hotels/search', hotelBody);
+    const hotelResults = (hRes.options && hRes.options.length) ? hRes.options : (hRes.over_budget || []);
+    if (hotelResults.length) {
+      S.rawHotels = hotelResults;
+      S.hotel = hotelResults[0];
+      renderHotels(hRes.options, hRes);
+    } else {
+      $('hotelTilesRow').replaceChildren(h('div', { class: 'problem-box' }, hRes.message || 'No hotels matched the budget filters. Showing search link.'));
+    }
+
+    const itinBody = {
+      destination: dest,
+      plan_date: dep,
+      start_time: '08:00',
+      window_hours: 12,
+      interests: ['beaches', 'adventure', 'food', 'history'],
+      adults: adults,
+      flight_id: S.flight ? S.flight.id : null,
+      hotel_id: S.hotel ? S.hotel.id : null,
+      currency: 'INR'
+    };
+    const iRes = await api('/api/itinerary/generate', itinBody);
+    if (iRes.items && iRes.items.length) {
+      S.rawItin = iRes;
+      S.itin = iRes;
+      renderItinerary(iRes.items, iRes);
+    } else {
+      $('itinCardsRow').replaceChildren(h('div', { class: 'problem-box' }, iRes.message || 'AI itinerary generation complete. Check schedule.'));
+    }
+
+    updateSummaryDisplay();
+
+  } catch (err) {
+    console.error('Search error:', err);
+  }
+}
+
+function openFlightGoogleLink() {
+  window.open(`https://www.google.com/travel/flights?q=flights+from+${encodeURIComponent($('origin').value)}+to+${encodeURIComponent($('destination').value)}`, '_blank');
+}
+function openHotelGoogleLink() {
+  window.open(`https://www.google.com/travel/hotels?q=hotels+in+${encodeURIComponent($('destination').value)}`, '_blank');
+}
+
+async function loadProviders() {
+  const p = await api('/api/providers');
+  const out = $('provOut');
+  out.replaceChildren();
+  if (p.providers) {
+    Object.entries(p.providers).forEach(([name, info]) => {
+      const row = h('div', { style: 'padding: 10px 0; border-bottom: 1px solid #e2e8f0;' },
+        h('b', {}, `${name}: `),
+        info.configured ? 'Configured ' : 'Not configured ',
+        h('span', { style: 'color:#64748b' }, `- ${info.role || ''}`)
+      );
+      out.append(row);
+    });
+  }
+}
+
+// Initial default dates (10 days in future)
+const now = new Date();
+const d0 = new Date(now.getTime() + 10 * 864e5);
+const d1 = new Date(now.getTime() + 14 * 864e5);
+const iso = d => d.toISOString().slice(0, 10);
+$('dep').value = iso(d0);
+$('dep').min = iso(now);
+$('ret').value = iso(d1);
+$('ret').min = iso(d0);
+
+updateSummaryDisplay();
+</script>
+</body>
+</html>

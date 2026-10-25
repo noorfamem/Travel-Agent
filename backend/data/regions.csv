@@ -1,0 +1,12 @@
+name,aliases,suggest_countries
+Europe,western europe|eastern europe|schengen,FR|IT|DE|ES|CH|GB|NL|AT
+Asia,,SG|MY|TH|JP|VN|ID|AE|HK
+Southeast Asia,south east asia|sea,SG|MY|TH|ID|VN|PH|KH
+East Asia,far east,JP|KR|CN|HK|TW
+Middle East,gulf|gcc|arabian gulf,AE|QA|OM|SA|BH|JO
+Africa,,ZA|KE|EG|MA|MU|TZ
+North America,,US|CA|MX
+South America,latin america,BR|AR|PE|CL|CO
+Oceania,australasia|pacific,AU|NZ|FJ
+Scandinavia,nordic|nordics|nordic countries,DK|SE|NO|FI|IS
+Caribbean,,CU|DO

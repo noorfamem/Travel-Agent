@@ -1,0 +1,9 @@
+fastapi==0.156.8
+uvicorn==0.54.0
+pydantic==2.14.1
+python-dotenv==1.2.4
+httpx==0.28.1
+requests==2.34.2
+pytest==8.4.2
+tzdata>=2024.1
+certifi>=2024.1

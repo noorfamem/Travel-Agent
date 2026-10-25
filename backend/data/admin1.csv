@@ -1,0 +1,37 @@
+code,name,country,kind,lat,lon,aliases
+AP,Andhra Pradesh,IN,State,17.69,83.22,
+AR,Arunachal Pradesh,IN,State,27.08,93.61,
+AS,Assam,IN,State,26.14,91.74,
+BR,Bihar,IN,State,25.59,85.14,
+CG,Chhattisgarh,IN,State,21.25,81.63,
+GA,Goa,IN,State,15.5,73.83,
+GJ,Gujarat,IN,State,23.02,72.57,
+HR,Haryana,IN,State,28.46,77.03,
+HP,Himachal Pradesh,IN,State,31.1,77.17,
+JH,Jharkhand,IN,State,23.34,85.31,
+KA,Karnataka,IN,State,12.97,77.59,
+KL,Kerala,IN,State,9.93,76.27,
+MP,Madhya Pradesh,IN,State,23.26,77.41,
+MH,Maharashtra,IN,State,19.08,72.88,
+MN,Manipur,IN,State,24.82,93.95,
+ML,Meghalaya,IN,State,25.57,91.88,
+MZ,Mizoram,IN,State,23.73,92.72,
+NL,Nagaland,IN,State,25.67,94.11,
+OD,Odisha,IN,State,20.3,85.82,orissa
+PB,Punjab,IN,State,31.63,74.87,
+RJ,Rajasthan,IN,State,26.91,75.79,
+SK,Sikkim,IN,State,27.34,88.61,
+TN,Tamil Nadu,IN,State,13.08,80.27,
+TG,Telangana,IN,State,17.39,78.48,
+TR,Tripura,IN,State,23.83,91.28,
+UP,Uttar Pradesh,IN,State,26.85,80.95,
+UK,Uttarakhand,IN,State,30.32,78.03,uttaranchal
+WB,West Bengal,IN,State,22.57,88.36,
+AN,Andaman and Nicobar Islands,IN,UT,11.62,92.73,andaman|andamans|andaman nicobar|andaman islands
+CH,Chandigarh,IN,UT,30.73,76.78,
+DD,Dadra and Nagar Haveli and Daman and Diu,IN,UT,20.4,72.83,daman and diu|dnh
+DL,Delhi,IN,UT,28.61,77.21,delhi ncr|ncr
+JK,Jammu and Kashmir,IN,UT,34.08,74.8,kashmir|j&k|jammu kashmir|kashmir valley|jammu & kashmir
+LA,Ladakh,IN,UT,34.15,77.58,
+LD,Lakshadweep,IN,UT,10.82,72.18,
+PY,Puducherry,IN,UT,11.93,79.83,pondicherry|pondy
